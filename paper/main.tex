@@ -1,0 +1,98 @@
+
+% {{{ preamble
+
+%\documentclass[10pt,letterpaper]{article}
+%\documentclass{article}
+\documentclass[twocolumn]{article}
+%\documentclass[12pt]{report}
+
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{nonfloat}
+\usepackage{amsmath}
+\usepackage{mathtools}
+
+\usepackage{listings}
+\lstset{numbers=left,
+		language=Verilog,
+%		basicstyle=\footnotesize,
+		captionpos=b,
+		xleftmargin=0.3in}
+
+\usepackage{sectsty}  % \sectionfont
+\sectionfont{\normalsize}
+\subsectionfont{\normalsize}
+
+\usepackage{vmargin}  % make the margins a bit smaller
+\setmarginsrb{1.0in}{1.0in}{1.0in}{1.0in}{0in}{0.25in}{0in}{0.20in}
+
+%\raggedright
+\setlength{\parindent}{0.2in}
+
+%
+% backend	: biber
+% style		: numeric
+% autocite	: footnote
+% citestyle	: verbose-inote
+% bibstyle	: authortitle, numeric
+%
+\usepackage[backend=biber,autocite=footnote,
+			bibstyle=authortitle,citestyle=verbose-inote]{biblatex}
+
+%\addbibresource{main.bib}
+\addbibresource{control.bib}
+
+% }}}
+
+\begin{document}
+
+\twocolumn[\begin{@twocolumnfalse}
+
+% {{{ title page
+
+\thispagestyle{empty}
+
+\centerline{\Large \textbf{A Survey of Control Systems Applied to}}
+\centerline{\Large \textbf{the Idle Control of an Automotive Engine}}
+\vspace{0.1in}
+\centerline{\normalsize {Jeremiah Mahler}}
+\centerline{\small {\href{mailto:jmahler@mail.csuchico.edu}{jmahler@mail.csuchico.edu}} }
+\vspace{0.1in}
+\centerline{\normalsize {CSU Chico}}
+%\centerline{\today}
+%\vspace{0.1in}
+\centerline{\small \today}
+\vspace{0.2in}
+\centerline{\LARGE \textbf{DRAFT}}
+\vspace{0.2in}
+
+% }}}
+
+\end{@twocolumnfalse}]
+
+%\begin{multicols}{2}
+
+% {{{ abstract
+%\pagebreak
+\thispagestyle{empty}
+\begin{abstract}
+\noindent
+
+% TOOD
+
+\end{abstract}
+% }}}
+
+\section{Model}
+
+% TODO
+
+\nocite{532315}
+
+% References
+\pagebreak
+\printbibliography[heading=bibintoc]
+
+\end{document}

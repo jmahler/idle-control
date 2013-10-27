@@ -2,22 +2,23 @@
 % {{{ preamble
 
 %\documentclass[10pt,letterpaper]{article}
-%\documentclass{article}
-\documentclass[twocolumn]{article}
+\documentclass{article}
+%\documentclass[twocolumn]{article}
 %\documentclass[12pt]{report}
 
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{graphicx}
-\usepackage{multicol}
+%\usepackage{multicol}
 \usepackage{nonfloat}
 \usepackage{amsmath}
 \usepackage{mathtools}
+\usepackage{parskip}
 
 \usepackage{listings}
 \lstset{numbers=left,
-		language=Verilog,
-%		basicstyle=\footnotesize,
+		language=Matlab,
+		basicstyle=\footnotesize,
 		captionpos=b,
 		xleftmargin=0.3in}
 
@@ -28,8 +29,8 @@
 \usepackage{vmargin}  % make the margins a bit smaller
 \setmarginsrb{1.0in}{1.0in}{1.0in}{1.0in}{0in}{0.25in}{0in}{0.20in}
 
-%\raggedright
-\setlength{\parindent}{0.2in}
+\raggedright
+%\setlength{\parindent}{0.2in}
 
 %
 % backend	: biber
@@ -47,8 +48,6 @@
 % }}}
 
 \begin{document}
-
-\twocolumn[\begin{@twocolumnfalse}
 
 % {{{ title page
 
@@ -70,21 +69,17 @@
 
 % }}}
 
-\end{@twocolumnfalse}]
-
-%\begin{multicols}{2}
-
 % {{{ abstract
 %\pagebreak
-\thispagestyle{empty}
-\begin{abstract}
-\noindent
+%\thispagestyle{empty}
+%\begin{abstract}
+%\noindent
 
 % TOOD
 
 % What methods are used? PID, direct? ...
 
-\end{abstract}
+%\end{abstract}
 % }}}
 
 \section{Model}
@@ -93,11 +88,83 @@ The engine model used here is based work
 by Butts and Sivashankar\autocite{532315} which is derived from
 the work by Powell and Cook\autocite{4789342}.
 The engine configuration is a modern 4.6L V-8.
-To simplify analysis the linearized model is used.
+To simplify analysis the linearized model is used as shown in
+Figure \ref{fig:lem}.
 
+\begin{figure}[hbp!]
+\begin{center}
+\includegraphics[scale=0.6]{img/schematic-linear_engine_model-ed1}
+\end{center}
+\caption{Linear engine model.}\label{fig:lem}
+\end{figure}
+
+This model takes two inputs: a torque, and a idle control signal.
+When the torque is greater than zero it will oppose the rotation of
+the engine causing it to slow down.
+The idle control signal is some fraction of unity.
+This fraction corresponds to a pulse width modulated idle control valve
+which is at a minimum near zero and at a maximum near unity.
+Often the duty cycle range is in a range from 0\% to 100\% which
+corresponds to 0 to 1 (unity).
+
+This model has one complication that makes it difficult to use compared
+to typical elementary control systems.
+All the inputs and outputs are specified as deltas ($\Delta$).
+The torque input, for example, cannot be given as a constant ($T$) because this
+actually means $\Delta T$
+
+To overcome this complication a simple feedback controller can be used
+as show in Figure \ref{fig:scont}.
+And the open loop controller, with a fixed input duty cycle, is shown
+in Figure \ref{fig:openloop}.
+Notice that in this example the torque has transient characteristics and
+varies over time.
+The output of this system is show in Figure \ref{fig:olplot}.
+
+\clearpage
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.6]{img/schematic-control-ed1}
+\end{center}
+\caption{Simple feedback controller for inputs.
+The gain can be used to slow down the input changes.
+The output is an accumulation of all the step inputs.}
+\label{fig:scont}
+\end{figure}
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.5]{img/schematic-no_control-ed1}
+\end{center}
+\caption{Linear engine model with an open loop controller.
+Inputs go through the simple controller to provide steps to the
+engine model.
+The output rpm, since it is in steps ($\Delta N$), is accumulated.}
+\label{fig:openloop}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.8]{img/linear_engine_model_no_control_plot}
+\end{center}
+\caption{Output of linear engine controller with a transient torque
+input and a fixed input duty cycle.  Matlab source given in
+Appendix \ref{app:olplot}}
+\label{fig:olplot}
+\end{figure}
 
 % References
-\pagebreak
+\clearpage
 \printbibliography[heading=bibintoc]
+
+\clearpage
+\appendix
+
+\section{Linear Engine Model Plot Matlab Script}
+\label{app:olplot}
+\lstinputlisting[language=Matlab]{../matlab/linear_engine_model_plot.m}
+
+\section{Linear Engine Model Initialization Matlab Script}
+\lstinputlisting[language=Matlab]{../matlab/linear_engine_model_init.m}
 
 \end{document}

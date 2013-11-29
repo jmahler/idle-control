@@ -13,17 +13,19 @@
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{parskip}
-\usepackage{bloques}
 \usepackage{fullpage}
 
 \usepackage{tikz}
-\usetikzlibrary{calc,arrows,positioning}
+\usetikzlibrary{calc,arrows,positioning,shadows}
 % control system tikz objects
-\tikzset{shadow/.style={drop shadow={opacity=0.8},fill=white}}
+\tikzset{shadow/.style={drop shadow,fill=white}}
 \tikzset{sum/.style={circle,draw,very thick,shadow,minimum size=6mm}}
 \tikzset{sumnp/.style={sum,
 				label={{above left,xshift=1.0mm,yshift=-1.0mm}:$+$},
 				label={{below left,xshift=1.0mm,yshift=1.0mm}:$-$}} }
+\tikzset{sumpn/.style={sum,
+				label={{above left,xshift=1.0mm,yshift=-1.0mm}:$+$},
+				label={{above right,xshift=-1.0mm,yshift=-1.0mm}:$-$}} }
 \tikzset{sumxpxp/.style={sum,
 				label={{above left,xshift=1.0mm,yshift=-1.0mm}:$+$},
 				label={{above right,xshift=-1.0mm,yshift=-1.0mm}:$+$}} }
@@ -95,7 +97,7 @@
 %\end{abstract}
 % }}}
 
-\section{Model}
+\section{Engine Model}
 
 The engine model used here is based work
 by Butts and Sivashankar\autocite{532315} which is derived from
@@ -104,22 +106,30 @@ The engine configuration is a modern 4.6L V-8.
 To simplify analysis the linearized model is used as shown in
 Figure \ref{fig:lem}.
 
-\xdistance{1.8cm}
-\ydistance{2.0cm}
-
 \begin{figure}[hbp!]
 \begin{center}
-\begin{tikzpicture}
-\bShadow
-\bStart{$\Delta \text{control}$}
-\bGain{$1.699$}
-\bMinusF{S1}
-\bGain{$\dfrac{8.5683}{z^2 - 0.9025 z}$}
-\bMinusUp{$\Delta \text{torque}$}
-\bGain{$\dfrac{2.98}{z - 0.9354}$}
-\bGainFeedBack{$0.000093$}{S1}
-\bEnd{$\Delta \text{rpm}$}
+
+\begin{tikzpicture}[>=triangle 60, scale=0.8,
+	node distance=14mm, auto]
+
+	\node[gain] 	(gain1)	[]					{$1.699$};
+	\node[sumnp]  	(sum1)	[right=of gain1] 	{};
+	\node[gain] 	(gain2)	[right=of sum1]		{$\dfrac{8.5683}{z^2-0.9025z}$};
+	\node[sumpn]  	(sum2)	[right=of gain2] 	{};
+	\node[gain] 	(gain3)	[right=of sum2]		{$\dfrac{2.98}{z - 0.9534}$};
+	\node[gain] 	(gain4)	[below=of sum2]		{$0.000093$};
+
+	\draw [->] (-20mm,0) node[above]{$\Delta \text{control}$} -- (gain1.west);
+	\draw [->] (gain1) -- (sum1);
+	\draw [->] (sum1) -- (gain2);
+	\draw [->] (gain2) -- (sum2);
+	\draw [->] (sum2) -- (gain3);
+	\draw [->] (gain3.east) -- ++(20mm,0) node[above]{$\Delta \text{rpm}$};
+	\draw [->] ($(gain3.east) + (10mm,0) $) |- (gain4.east);
+	\draw [->] (gain4.west) -| (sum1.south);
+	\draw [<-] (sum2.north) -- ++(0,10mm) node[above]{$\Delta \text{torque}$};
 \end{tikzpicture}
+
 \end{center}
 \caption{Linear engine model.}\label{fig:lem}
 \end{figure}

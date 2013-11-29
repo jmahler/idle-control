@@ -17,18 +17,22 @@
 
 \usepackage{tikz}
 \usetikzlibrary{calc,arrows,positioning,shadows}
+%
 % control system tikz objects
 \tikzset{shadow/.style={drop shadow,fill=white}}
 \tikzset{sum/.style={circle,draw,very thick,shadow,minimum size=6mm}}
 \tikzset{sumnp/.style={sum,
-				label={{above left,xshift=1.0mm,yshift=-1.0mm}:$+$},
-				label={{below left,xshift=1.0mm,yshift=1.0mm}:$-$}} }
+				label={{above left,xshift=0.0mm,yshift=-1.0mm}:$+$},
+				label={{below right,xshift=-1.0mm,yshift=0.0mm}:$-$}} }
+\tikzset{sumpp/.style={sum,
+				label={{above left,xshift=0.0mm,yshift=-1.0mm}:$+$},
+				label={{below right,xshift=-1.0mm,yshift=0.0mm}:$+$}} }
 \tikzset{sumpn/.style={sum,
-				label={{above left,xshift=1.0mm,yshift=-1.0mm}:$+$},
-				label={{above right,xshift=-1.0mm,yshift=-1.0mm}:$-$}} }
+				label={{below left,xshift=0.0mm,yshift=1.0mm}:$+$},
+				label={{above right,xshift=-1.0mm,yshift=0.0mm}:$-$}} }
 \tikzset{sumxpxp/.style={sum,
-				label={{above left,xshift=1.0mm,yshift=-1.0mm}:$+$},
-				label={{above right,xshift=-1.0mm,yshift=-1.0mm}:$+$}} }
+				label={{above left,xshift=0.0mm,yshift=-1.0mm}:$+$},
+				label={{above right,xshift=-0.0mm,yshift=-1.0mm}:$+$}} }
 \tikzset{gain/.style={rectangle,draw,very thick,inner sep=2mm,shadow}}
 
 \usepackage{listings}
@@ -131,7 +135,7 @@ Figure \ref{fig:lem}.
 \end{tikzpicture}
 
 \end{center}
-\caption{Linear engine model.}\label{fig:lem}
+\caption{Linear engine model of a modern 4.6L V-8.}\label{fig:lem}
 \end{figure}
 
 This model takes two inputs: a torque, and a idle control signal.
@@ -143,57 +147,93 @@ which is at a minimum near zero and at a maximum near unity.
 Often the duty cycle range is in a range from 0\% to 100\% which
 corresponds to 0 to 1 (unity).
 
-This model has one complication that makes it difficult to use compared
-to typical control systems.
-All the inputs and outputs are specified as deltas ($\Delta$).
-The torque input, for example, cannot be given as a constant ($T$) because this
-actually means $\Delta T$
+Because all the inputs and outputs are defined as deltas ($\Delta$)
+this model cannot be used directly with typical control systems
+which use steady state values.
+It is possible convert these deltas to steady state equivalents.
+Figure \ref{fig:sdtf} shows the transfer function to convert steady
+state values to delta values.
+Figure \ref{fig:dstf} shows the transfer function to delta values
+to steady state values.
 
-To overcome this complication a simple feedback controller can be used
-as show in Figure \ref{fig:scont}.
-And the open loop controller, with a fixed input duty cycle, is shown
-in Figure \ref{fig:openloop}.
-Notice that in this example the torque has transient characteristics and
-varies over time.
-The output of this system is show in Figure \ref{fig:olplot}.
-
-\clearpage
+% {{{ fig:sdtf
 \begin{figure}[!htbp]
-\begin{center}
 
+\begin{center}
 \begin{tikzpicture}[>=triangle 60]
 \node[gain] (gain1) [] {$1 - z^{-1}$};
-\draw [->] (-30mm,0) node[above,yshift=1mm]{$X$} -- (gain1.west);
-\draw [->] (gain1.east) -- (30mm,0) node[above,yshift=1mm]{$\Delta X$};
+\draw [->] (-20mm,0) node[above,yshift=1mm]{$X$} -- (gain1.west);
+\draw [->] (gain1.east) -- (20mm,0) node[above,yshift=1mm]{$\Delta X$};
 \end{tikzpicture}
-
 \end{center}
-\caption{$Z$ transform used to accumulate the input and convert
+
+\caption{The $Z$ transform used to accumulate the input and convert
 a steady state input to delta output.
-For its derivation, see Appendix \ref{app:cdelta}.}
-\label{fig:scont}
-\end{figure}
+Its derivation is given in Appendix \ref{app:cdelta}.}
+\label{fig:sdtf}
 
+\end{figure}
+% }}}
+
+% {{{ fig:dstf
 \begin{figure}[!htbp]
-\begin{center}
-\includegraphics[scale=0.5]{img/schematic-no_control-ed1}
-\end{center}
-\caption{Linear engine model with an open loop controller.
-Inputs go through the simple controller to provide steps to the
-engine model.
-The output rpm, since it is in steps ($\Delta N$), is accumulated.}
-\label{fig:openloop}
-\end{figure}
 
-\begin{figure}
 \begin{center}
-\includegraphics[scale=0.8]{img/linear_engine_model_no_control_plot}
+\begin{tikzpicture}[>=triangle 60]
+\node[gain] (gain1) [] {$\dfrac{1}{1 - z^{-1}}$};
+\draw [->] (-20mm,0) node[above,yshift=1mm]{$\Delta X$} -- (gain1.west);
+\draw [->] (gain1.east) -- (20mm,0) node[above,yshift=1mm]{$X$};
+\end{tikzpicture}
 \end{center}
-\caption{Output of linear engine controller with a transient torque
-input and a fixed input duty cycle.  Matlab source given in
-Appendix \ref{app:olplot}}
-\label{fig:olplot}
+
+\caption{The $Z$ transform used to convert delta input to a steady
+state output.
+Its derivation is given in Appendix \ref{app:dsderiv}.}
+\label{fig:dstf}
+
 \end{figure}
+% }}}
+
+% TODO - delta to steady state
+
+Typical control systems have an associated time step which can be
+varied and is crucial in determining the performance of
+the controller with regard to the Nyquist frequency.
+This model has no such constraint because one calculation step
+corresponds directly to one engine ignition event.
+The controller is effectively running at the same ``clock speed'' as
+the engine.
+
+% TODO - steady state model
+
+%And the open loop controller, with a fixed input duty cycle, is shown
+%in Figure \ref{fig:openloop}.
+%Notice that in this example the torque has transient characteristics and
+%varies over time.
+%The output of this system is show in Figure \ref{fig:olplot}.
+
+% TODO - open loop performance
+
+%\begin{figure}[!htbp]
+%\begin{center}
+%\includegraphics[scale=0.5]{img/schematic-no_control-ed1}
+%\end{center}
+%\caption{Linear engine model with an open loop controller.
+%Inputs go through the simple controller to provide steps to the
+%engine model.
+%The output rpm, since it is in steps ($\Delta N$), is accumulated.}
+%\label{fig:openloop}
+%\end{figure}
+
+%\begin{figure}
+%\begin{center}
+%\includegraphics[scale=0.8]{img/linear_engine_model_no_control_plot}
+%\end{center}
+%%\caption{Output of linear engine controller with a transient torque
+%input and a fixed input duty cycle.  Matlab source given in
+%Appendix \ref{app:olplot}}
+%\label{fig:olplot}
+%\end{figure}
 
 % References
 \clearpage
@@ -202,9 +242,9 @@ Appendix \ref{app:olplot}}
 \clearpage
 \appendix
 
-% {{{ Steady State to Delta $Z$ Transform Derivation
+% {{{ Steady State to Delta Transform Derivation
 \clearpage
-\section{Steady State to Delta $Z$ Transform Derivation}
+\section{Steady State to Delta Transform Derivation}
 \label{app:cdelta}
 
 To accumulate a steady state input to produce a delta output
@@ -303,8 +343,8 @@ function of the entire system ($y/u$).
 
 \begin{tikzpicture}[>=triangle 60]
 \node[gain] (gain1) [] {$1 - z^{-1}$};
-\draw [->] (-30mm,0) node[above,yshift=1mm]{$u$} -- (gain1.west);
-\draw [->] (gain1.east) -- (30mm,0) node[above,yshift=1mm]{$y$};
+\draw [->] (-20mm,0) node[above,yshift=1mm]{$u$} -- (gain1.west);
+\draw [->] (gain1.east) -- (20mm,0) node[above,yshift=1mm]{$y$};
 \end{tikzpicture}
 
 \end{center}
@@ -357,6 +397,118 @@ steady state to delta system.},
 to delta system.},
 	label=lst:cd2_plot
 	]{../octave/cd2_plot.m}
+
+% }}}
+
+% {{{ Delta to Steady State Transform Derivation
+\clearpage
+\section{Delta to Steady State Transform Derivation}
+\label{app:dsderiv}
+
+To convert a delta input to a steady state output it should
+sum the history of values.
+Figure \ref{fig:dc1} shows the system.
+
+% {{{ fig:dc1
+\begin{figure}[hpb!]
+\begin{center}
+
+\begin{tikzpicture}[>=triangle 60,
+	node distance=14mm, auto]
+
+	\node[sumpp]  	(sum1)	[] 						{};
+	\node[gain] 	(gain1)	[below right=of sum1]	{$z^{-1}$};
+
+	\draw [->] (gain1.west) -| (sum1.south) node[left,yshift=-10mm]{$r$};
+	\draw [<-] (sum1.west) -- ++(-20mm,0) node[above]{$u$};
+	\draw [->] (sum1.east) -- (50mm,0) node[above]{$y$};
+	\draw [->] ($ (sum1.east) + (30mm,0) $)
+			|- (gain1.east);
+\end{tikzpicture}
+
+\end{center}
+
+\caption{System to convert delta input to steady state output.}
+\label{fig:dc1}
+\end{figure}
+% }}}
+
+This system can be simplified in to a single transfer function
+as given by Equation \ref{eq:dc2s} and shown in Figure \ref{fig:dc1s}.
+
+\begin{align}
+	y &= u + r \notag \\
+	r &= y \cdot z^{-1} \notag \\
+	y &= u + y z^{-1} \notag \\
+	y &= y(1 - z^{-1}) \notag \\
+	\Aboxed{ \frac{y}{u} &= \frac{1}{1 - z^{-1}} } \label{eq:dc2s}
+\end{align}
+
+% {{{ fig:dc1s
+\begin{figure}[!htbp]
+\begin{center}
+
+\begin{tikzpicture}[>=triangle 60]
+\node[gain] (gain1) [] {$1 - z^{-1}$};
+\draw [->] (-20mm,0) node[above,yshift=1mm]{$u$} -- (gain1.west);
+\draw [->] (gain1.east) -- (20mm,0) node[above,yshift=1mm]{$y$};
+\end{tikzpicture}
+
+\end{center}
+\caption{Simplified system to convert a delta input to
+a steady state output.}
+\label{fig:dc1s}
+\end{figure}
+% }}}
+
+Figure \ref{fig:dc2_plot} shows the response of this system given
+an arbitrary input
+\footnote{This input is actually the output of the steady state input
+to delta output given in Appendix \ref{app:cdelta}.
+They are equal and opposite as expected.}.
+It can be seen that the output is held in a steady state according
+to the delta inputs as expected.
+
+% {{{ fig:dc2_plot
+\begin{figure}[htbp!]
+\includegraphics[scale=0.7]{../octave/dc2_plot}
+\caption{Response of delta input to steady state output system
+when given an arbitrary input signal.
+The upper plot is the input signal ($u$) and the lower plot is
+the output response ($y$).
+The Matlab source code is given in Listing \ref{lst:dc2_init}
+and \ref{lst:dc2_plot}.
+}
+\label{fig:dc2_plot}
+\end{figure}
+% }}}
+
+\clearpage
+\subsection{Matlab Source}
+\label{app:dcsrc}
+
+The following code has been tested using Octave\autocite{octave},
+an open source Matlab clone.
+
+%\lstinputlisting[caption={Matlab code to initialize the full
+%steady state to delta system.},
+%	label=lst:dc1_init
+%	]{../octave/dc1_init.m}
+%
+%\lstinputlisting[caption={Matlab code to plot the full steady state
+%to delta system.},
+%	label=lst:dc1_plot
+%	]{../octave/dc1_plot.m}
+
+\lstinputlisting[caption={Matlab code to initialize the simplified
+steady state to delta system.},
+	label=lst:dc2_init
+	]{../octave/dc2_init.m}
+
+\lstinputlisting[caption={Matlab code to plot the simplified steady state
+to delta system.},
+	label=lst:dc2_plot
+	]{../octave/dc2_plot.m}
 
 % }}}
 

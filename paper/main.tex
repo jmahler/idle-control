@@ -6,15 +6,15 @@
 %\documentclass[twocolumn]{article}
 %\documentclass[12pt]{report}
 
-\usepackage{url}
+%\usepackage{url}
 \usepackage{hyperref}
 \usepackage{graphicx}
-%\usepackage{multicol}
 \usepackage{nonfloat}
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{parskip}
 \usepackage{bloques}
+\usepackage{fullpage}
 
 \usepackage{tikz}
 \usetikzlibrary{calc,arrows,positioning}
@@ -23,29 +23,24 @@
 \tikzset{sum/.style={circle,draw,very thick,shadow,minimum size=6mm}}
 \tikzset{sumnp/.style={sum,
 				label={{above left,xshift=1.0mm,yshift=-1.0mm}:$+$},
-				label={{below left,xshift=1.0mm,yshift=1.0mm}:$-$}}}
+				label={{below left,xshift=1.0mm,yshift=1.0mm}:$-$}} }
 \tikzset{sumxpxp/.style={sum,
 				label={{above left,xshift=1.0mm,yshift=-1.0mm}:$+$},
-				label={{above right,xshift=-1.0mm,yshift=-1.0mm}:$+$}}}
+				label={{above right,xshift=-1.0mm,yshift=-1.0mm}:$+$}} }
 \tikzset{gain/.style={rectangle,draw,very thick,inner sep=2mm,shadow}}
-%\newcommand{\nodesum}[2]{
-%\node[sum]  (#1) [label={{above left,xshift=1.5mm,yshift=-1.5mm}:$+$},
-%				  label={{below left,xshift=1.5mm,yshift=1.5mm}:$-$},#2] {};
-%}
 
 \usepackage{listings}
 \lstset{numbers=left,
 		language=Matlab,
 		basicstyle=\footnotesize,
 		captionpos=b,
+		showspaces=false,
+		showstringspaces=false,
 		xleftmargin=0.3in}
 
 \usepackage{sectsty}  % \sectionfont
 \sectionfont{\normalsize}
 \subsectionfont{\normalsize}
-
-\usepackage{vmargin}  % make the margins a bit smaller
-\setmarginsrb{1.0in}{1.0in}{1.0in}{1.0in}{0in}{0.25in}{0in}{0.20in}
 
 \raggedright
 %\setlength{\parindent}{0.2in}
@@ -60,8 +55,8 @@
 \usepackage[backend=biber,autocite=footnote,
 			bibstyle=authortitle,citestyle=verbose-inote]{biblatex}
 
-%\addbibresource{main.bib}
-\addbibresource{control.bib}
+\addbibresource{main.bib}
+\setlength\bibitemsep{1em}
 
 % }}}
 
@@ -156,30 +151,16 @@ The output of this system is show in Figure \ref{fig:olplot}.
 \begin{figure}[!htbp]
 \begin{center}
 
-\begin{tikzpicture}
-%\xdistance{1.2cm}
-%\ydistance{1.5cm}
-\bShadow
-\bStart{$X$}
-\bGain{$1 - z^{-1}$}
-\bEnd{$\Delta X$}
+\begin{tikzpicture}[>=triangle 60]
+\node[gain] (gain1) [] {$1 - z^{-1}$};
+\draw [->] (-30mm,0) node[above,yshift=1mm]{$X$} -- (gain1.west);
+\draw [->] (gain1.east) -- (30mm,0) node[above,yshift=1mm]{$\Delta X$};
 \end{tikzpicture}
-
-%\begin{tikzpicture}
-%\xdistance{1.2cm}
-%\ydistance{1.5cm}
-%\bShadow
-%\bStart{$X$}
-%\bMinusF{S1}
-%\bGain{$\Sigma$}
-%\bFeedBack{}{S1}
-%\bEnd{$\Delta X$}
-%\end{tikzpicture}
 
 \end{center}
 \caption{$Z$ transform used to accumulate the input and convert
 a steady state input to delta output.
-See Appendix \ref{app:cdelta} for the derivation.}
+For its derivation, see Appendix \ref{app:cdelta}.}
 \label{fig:scont}
 \end{figure}
 
@@ -212,20 +193,31 @@ Appendix \ref{app:olplot}}
 \appendix
 
 % {{{ Steady State to Delta $Z$ Transform Derivation
+\clearpage
 \section{Steady State to Delta $Z$ Transform Derivation}
 \label{app:cdelta}
 
-\begin{figure}
+To accumulate a steady state input to produce a delta output
+a system can be constructed as shown in Figure \ref{fig:cd1}.
+Its operation can be confirmed by trying some values.
+If all values are zero and then a $1$ is input on $u$ the
+output will become $1$.
+On the next time step $1$ will be output on $v$.
+Since $q$ is zero $r$ will be $1$.
+If the input ($u$) remains $1$ this will be subtracted from $r$
+to produce zero on the output ($y$).
+
+% {{{ fig:cd1
+\begin{figure}[hpb!]
 \begin{center}
 
 \begin{tikzpicture}[>=triangle 60,
 	node distance=14mm, auto]
-%	[inner sep=10mm, minimum size=6mm, node distance=20mm]
 
-	\node[sumnp]  (sum1)	[] 					{};
-	\node[sumxpxp] (sum2)	[below=of sum1] 	{};
-	\node[gain] (gain1)		[right=of sum2]		{$z^{-1}$};
-	\node[gain] (gain2)		[left=of sum2]		{$z^{-1}$};
+	\node[sumnp]  	(sum1)	[] 					{};
+	\node[sumxpxp] 	(sum2)	[below=of sum1] 	{};
+	\node[gain] 	(gain1)	[right=of sum2]		{$z^{-1}$};
+	\node[gain] 	(gain2)	[left=of sum2]		{$z^{-1}$};
 
 	\draw [->] (sum2.north) -- 					(sum1.south);
 	\draw [->] (gain1.west) -- node[below]{$v$} 	(sum2.east);
@@ -233,7 +225,7 @@ Appendix \ref{app:olplot}}
 
 	 \draw [->]
 	 		($ (sum1.south) - (0,7mm) $)
-			-- ++(-35mm,0) node[below left]{$r$} 
+			-- ++(-35mm,0) node[below left,yshift=-3mm]{$r$} 
 			|- (gain2.west);
 	\draw [->]
 			(-45mm,0) node[above] {$u$} to (sum1);
@@ -242,58 +234,123 @@ Appendix \ref{app:olplot}}
 	\draw [->]
 			($(sum1.east) + (33mm,0) $)
 			|- (gain1);
-
 \end{tikzpicture}
-
-%\tikzstyle{block}=[draw,minimum size=2.4em]
-%
-%\tikzstyle{sum}=[draw,circle,minimum size=1.2em]
-%
-%%\tikzstyle{init} = [pin edge={to-,thin,black}]
-%\begin{tikzpicture}[node distance=2.0cm,auto,>=latex']
-%
-%	% place all the block, points, relative to each other
-%	\node [coordinate,node distance=2cm] (u) {u};
-%	\node [block,right of=u] (k) {$K$};
-%
-%	\node [sum,right of=k] (s) {};
-%
-%	\node [coordinate,below of=s] (ds) {ds};
-%	\node [block,right of=ds] (d) {$D(s)$};
-%	\node [block,right of=s] (g) {$G(s)$};
-%	\node [coordinate,right of=g] (gdy) {};
-%	\node [coordinate,right of=gdy,node distance=2cm] (y) {y};
-%	\node [coordinate,right of=d] (gd) {gd};
-%
-%	% add signs to sum
-%	\node [left of=s,node distance=0cm,xshift=-3mm,yshift=3mm] {$+$};
-%	\node [left of=s,node distance=0cm,xshift=-3mm,yshift=-4mm] {$-$};
-%
-%	% add labels to G(s) and D(s)
-%	\node [right of=g,node distance=0cm,xshift=8mm,yshift=6mm] {$\dfrac{B}{A}$};
-%	\node [right of=d,node distance=0cm,xshift=8mm,yshift=6mm] {$\dfrac{\beta}{\alpha}$};
-%
-%	% connect all the nodes and points
-%	\path[->] (u) edge node {$u$} (k);
-%	\path[->] (k) edge node {} (s);
-%	\path[->] (ds) edge node {} (s);
-%	\path[-]  (d) edge node {} (ds);
-%	\path[->] (s) edge node {$\epsilon$} (g);
-%	\path[-] (g) edge node {} (gdy);
-%	\path[->] (gdy) edge node {$y$} (y);
-%	\path[-] (gdy) edge node {} (gd);
-%	\path[->] (gd) edge node {} (d);
-%
-%\end{tikzpicture}
 
 \end{center}
 
 \caption{System to accumulate values to convert a steady state
 input to a delta output.}
+\label{fig:cd1}
 \end{figure}
 
 % }}}
 
+Figure \ref{fig:cd1_plot} shows the response of this system given
+an arbitrary input.
+It can be seen that if the input is held constant the output (delta)
+returns to zero as expected.
+
+\begin{figure}[htbp!]
+\includegraphics[scale=0.7]{../octave/cd1_plot}
+\caption{Response of full steady state input to delta output system
+to an arbitrary input signal.
+The upper plot is the input signal ($u$) and the lower plot is
+the output response ($y$).
+The Matlab source code is given in Listing \ref{lst:cd1_init}
+and \ref{lst:cd1_plot}.
+}
+\label{fig:cd1_plot}
+\end{figure}
+
+\begin{samepage}
+However this full system can be simplified to a single transfer function.
+Starting from the equations that define the system
+\begin{align}
+	r &= q + v \label{eq:cd1a} \\
+	v &= y \cdot z^{-1} \label{eq:cd1b} \\
+	q &= r \cdot z^{-1} \label{eq:cd1c} \\
+	y &= u - r \label{eq:cd1d}
+\end{align}
+these can be algebraically manipulated to find the effective transfer
+function of the entire system ($y/u$).
+\end{samepage}
+
+\begin{align*}
+	r &= r z^{-1} + y z^{-1} && (\ref{eq:cd1a}, \ref{eq:cd1b}, \ref{eq:cd1c})\\
+	r(1 - z^{-1}) &= y z^{-1} \\
+	r &= u - y && (\ref{eq:cd1d} \\
+	(u - y)(1 - z^{-1}) &= y z^{-1} \\
+	u - y - u z^{-1} + y z^{-1} &= y z^{-1} \\
+	u - y - u z^{-1} &= 0 \\
+	y &= u (1 - z^{-1})
+\end{align*}
+\begin{align}
+	\Aboxed{ \frac{y}{u} &= 1 - z^{-1} }
+\end{align}
+
+\begin{figure}[!htbp]
+\begin{center}
+
+\begin{tikzpicture}[>=triangle 60]
+\node[gain] (gain1) [] {$1 - z^{-1}$};
+\draw [->] (-30mm,0) node[above,yshift=1mm]{$u$} -- (gain1.west);
+\draw [->] (gain1.east) -- (30mm,0) node[above,yshift=1mm]{$y$};
+\end{tikzpicture}
+
+\end{center}
+\caption{Simplified system to convert a steady state input in to
+a delta output.}
+\label{fig:cd1s}
+\end{figure}
+
+It can be seen in Figure \ref{fig:cd2_plot} that the simplified system
+behaves identically to the previous system (Figure \ref{fig:cd1_plot}).
+
+\begin{figure}[htbp!]
+\includegraphics[scale=0.7]{../octave/cd2_plot}
+\caption{Response of simplified steady state input to delta output system
+to an arbitrary input signal.
+The upper plot is the input signal ($u$) and the lower plot is
+the output response ($y$).
+Response is identical to the full system in Figure \ref{fig:cd1_plot}
+as expected.
+The Matlab source code is given in Listing \ref{lst:cd2_init}
+and \ref{lst:cd2_plot}.
+}
+\label{fig:cd2_plot}
+\end{figure}
+
+\clearpage
+\subsection{Matlab Source}
+\label{app:cdsrc}
+
+The following code has been tested using Octave\autocite{octave},
+an open source Matlab clone.
+
+\lstinputlisting[caption={Matlab code to initialize the full
+steady state to delta system.},
+	label=lst:cd1_init
+	]{../octave/cd1_init.m}
+
+\lstinputlisting[caption={Matlab code to plot the full steady state
+to delta system.},
+	label=lst:cd1_plot
+	]{../octave/cd1_plot.m}
+
+\clearpage
+\lstinputlisting[caption={Matlab code to initialize the simplified
+steady state to delta system.},
+	label=lst:cd2_init
+	]{../octave/cd2_init.m}
+
+\lstinputlisting[caption={Matlab code to plot the simplified steady state
+to delta system.},
+	label=lst:cd2_plot
+	]{../octave/cd2_plot.m}
+
+% }}}
+
+\clearpage
 \section{Linear Engine Model Plot Matlab Script}
 \label{app:olplot}
 \lstinputlisting[language=Matlab]{../matlab/linear_engine_model_plot.m}

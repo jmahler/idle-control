@@ -91,22 +91,30 @@
 % {{{ abstract
 %\pagebreak
 %\thispagestyle{empty}
-%\begin{abstract}
-%\noindent
+\begin{abstract}
+\noindent
+The task of maintaining a stable idle for an internal combustion
+engine with spark ignition is non-trivial.
+Any time an accessory is turned on/off the torque applied to
+the engine changes.
+And changes in torque will change the engine rpm if the control
+inputs are constant.
+This paper shows how control systems methods can be applied to
+the problem of idle stabilization.
+Methods include: pole placement, PID, direct design, and
+various state space designs.
 
-% TOOD
-
-% What methods are used? PID, direct? ...
-
-%\end{abstract}
+\end{abstract}
 % }}}
 
 \section{Engine Model}
 
 The engine model used here is based work
-by Butts and Sivashankar\autocite{532315} which is derived from
+by Butts and Sivashankar\autocite{532315} which was derived from
 the work by Powell and Cook\autocite{4789342}.
-The engine configuration is a modern 4.6L V-8.
+The configuration is a modern 4.6L V-8 gas engine.
+A single control input representing the idle air bypass valve 
+
 To simplify analysis the linearized model is used as shown in
 Figure \ref{fig:lem}.
 
@@ -250,24 +258,26 @@ First taking the parts from the engine model (Figure \ref{fig:lem}).
 	\frac{\beta}{\alpha} &= 0.00093 
 \end{align*}
 
+\begin{samepage}
 Then substituting them in to Equation \ref{eq:dd} results in
 the simplified from of Equation \ref{eq:lems}.
-
 \begin{align}
 	\frac{y}{u} &= \frac{(1.699) (8.5683) (2.98) (1)}
 		{(z^2 - 0.9025z)(z - 0.9354)(1) + (8.5683)(2.98)(0.00093)} \notag \\
 	\Aboxed{ \frac{y}{u} &= \frac{43.38}{z^3 - 1.838 z^2 + 0.8442 z + 0.02375}}
 		\label{eq:lems}
 \end{align}
+\end{samepage}
 
 \begin{samepage}
 It is still necessary to address the delta inputs and outputs.
-It can be seen in Figure \ref{fig:nodelta} there is a beneficial
-side effect that makes this trivial.  The transform that converts
-from steady state to a delta cancels
+It can be seen in Figure \ref{fig:nodelta} that there is a beneficial
+side effect which makes this trivial.
+The transform that converts from steady state to a delta cancels
 with the transform that converts from a delta to steady state
-\footnote{If the torque input was non zero the transforms would not
-cancel.}.  Therefore the final transform is still Equation \ref{eq:lems}.
+\footnote{In the more general case, when torque is non zero,
+the transforms would not cancel.}.
+Therefore the final transform is still Equation \ref{eq:lems}.
 An example of the output response with no control is shown in
 Figure \ref{fig:em_plot}.
 \end{samepage}
@@ -302,15 +312,12 @@ to delta and vice versa.}
 \includegraphics[scale=0.7]{../octave/engine_model_plot}
 \end{center}
 \caption{Output response of engine model with no control.
-The control can range from zero to one.}
+The control can range from zero to one.
 Here the control is constant at 0.65 which resulted in a stable
-rpm near 900.
-The Matlab script is provided in Appendix \ref{app:em_matlab}.
+rpm near 900.\protect\footnotemark}
 \label{fig:em_plot}
 \end{figure}
-
-
-% see octave/engine_model.m for these calculations
+\footnotetext{The Matlab source to produced these plots is in Appendix \ref{app:em_matlab}.}
 
 \clearpage
 \section{Regulator Control System}

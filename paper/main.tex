@@ -113,15 +113,15 @@ Figure \ref{fig:lem}.
 \begin{figure}[hbp!]
 \begin{center}
 
-\begin{tikzpicture}[>=triangle 60, scale=0.8,
+\begin{tikzpicture}[>=triangle 60, scale=0.7,
 	node distance=14mm, auto]
 
 	\node[gain] 	(gain1)	[]					{$1.699$};
 	\node[sumnp]  	(sum1)	[right=of gain1] 	{};
 	\node[gain] 	(gain2)	[right=of sum1]		{$\dfrac{8.5683}{z^2-0.9025z}$};
 	\node[sumpn]  	(sum2)	[right=of gain2] 	{};
-	\node[gain] 	(gain3)	[right=of sum2]		{$\dfrac{2.98}{z - 0.9534}$};
-	\node[gain] 	(gain4)	[below=of sum2]		{$0.000093$};
+	\node[gain] 	(gain3)	[right=of sum2]		{$\dfrac{2.98}{z - 0.9354}$};
+	\node[gain] 	(gain4)	[below=of sum2]		{$0.00093$};
 
 	\draw [->] (-20mm,0) node[above]{$\Delta \text{control}$} -- (gain1.west);
 	\draw [->] (gain1) -- (sum1);
@@ -204,23 +204,115 @@ step of the model.
 
 % TODO - reduced steady state system
 
-Typical control system models have a single input and a single output
-\footnote{One input/output could also be a vector.}.
-However this model is different in that it takes
-two inputs: control and torque (Figure \ref{fig:lem}).
-One way to reduce the model to a single input single output is to hold
-one of the inputs constant.
-However neither of the resulting use cases would make any sense to
-a designer whose primary goal is to stabilize engine rpm.
-The first case, with torque constant, would indicate the response for
-control inputs.
-But this is pointless because the goal of idle stabilization is to
-regulate the rpm given changes in torque.
-The second case, with control held constant, would indicate the response
-for a change in torque.
-But again this would provide no useful way to stabilize engine rpm.
-Both inputs are needed in order to construct any viable control system.
+In order to build a controller the model needs to be simplified
+but the presence of two inputs complicates matters.
+To resolve this issue the torque can be set zero.
+With this change it can be simplified by first recognizing that
+it matches the form shown in Figure \ref{fig:dd} which
+has the transfer function in Equation \ref{eq:dd}.
 
+% {{{ dd figure
+\begin{figure}[h!]
+
+\begin{center}
+\begin{tikzpicture}[>=triangle 60, scale=0.8,
+	node distance=20mm, auto]
+
+	\node[gain]		(K) 	[] 				{$K$};
+	\node[sumnp]	(sum1) 	[right of=K] 	{};
+	\node[gain]		(Gz) 	[right of=sum1]	{$G(z)$};
+	\node[gain]		(Dz) 	[below of=Gz] 	{$D(z)$};
+
+	\draw [<-] (K) -- ++(-20mm,0) node[above]{$u$};
+	\draw [->] (K) -- (sum1);
+	\draw [->] (sum1) -- (Gz);
+	\draw [<-] (sum1) |- (Dz);
+	\draw [->] (Gz) -- ++(35mm,0) node[above]{$y$};
+	\draw [->] (Gz) -- ++(20mm,0) |- (Dz.east);
+\end{tikzpicture}
+\end{center}
+
+\caption{Direct Design system with $K$ as a scaling input, $G$ is
+the plant and $D$ is the controller.}
+\label{fig:dd}
+\end{figure}
+% }}}
+
+\begin{align}
+\frac{y}{u} &= K \frac{B \alpha}{A \alpha + B \beta} \label{eq:dd}
+\end{align}
+
+First taking the parts from the engine model (Figure \ref{fig:lem}).
+
+\begin{align*}
+	\frac{B}{A} &= \frac{8.5683}{(z^2 - 0.9025z)} \frac{2.98}{(z - 0.9354)} \\
+	K &= 1.699 \\
+	\frac{\beta}{\alpha} &= 0.00093 
+\end{align*}
+
+Then substituting them in to Equation \ref{eq:dd} results in
+the simplified from of Equation \ref{eq:lems}.
+
+\begin{align}
+	\frac{y}{u} &= \frac{(1.699) (8.5683) (2.98) (1)}
+		{(z^2 - 0.9025z)(z - 0.9354)(1) + (8.5683)(2.98)(0.00093)} \notag \\
+	\Aboxed{ \frac{y}{u} &= \frac{43.38}{z^3 - 1.838 z^2 + 0.8442 z + 0.02375}}
+		\label{eq:lems}
+\end{align}
+
+\begin{samepage}
+It is still necessary to address the delta inputs and outputs.
+It can be seen in Figure \ref{fig:nodelta} there is a beneficial
+side effect that makes this trivial.  The transform that converts
+from steady state to a delta cancels
+with the transform that converts from a delta to steady state
+\footnote{If the torque input was non zero the transforms would not
+cancel.}.  Therefore the final transform is still Equation \ref{eq:lems}.
+An example of the output response with no control is shown in
+Figure \ref{fig:em_plot}.
+\end{samepage}
+
+% {{{ fig:nodelta
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{tikzpicture}[>=triangle 60,
+	node distance=30mm, auto]
+
+\node[gain] (gain1) [] {$1 - z^{-1}$};
+\node[gain] (engine) [right of=gain1] {engine};
+\node[gain] (gain3) [right of=engine] {$\dfrac{1}{1 - z^{-1}}$};
+
+\draw [->] (-25mm,0) node[above]{$u$} -- (gain1.west);
+\draw [->] (gain1.east) node[above,xshift=6mm]{$\Delta u$} -- (engine);
+\draw [->] (engine.east) node[above,xshift=6mm]{$\Delta y$} -- (gain3);
+\draw [->] (gain3.east) -- ++(20mm,0) node[above]{$y$};
+\end{tikzpicture}
+\end{center}
+
+\caption{Engine model with transforms for converting from steady state
+to delta and vice versa.}
+\label{fig:nodelta}
+
+\end{figure}
+% }}}
+
+\begin{figure}[htbp!]
+\begin{center}
+\includegraphics[scale=0.7]{../octave/engine_model_plot}
+\end{center}
+\caption{Output response of engine model with no control.
+The control can range from zero to one.}
+Here the control is constant at 0.65 which resulted in a stable
+rpm near 900.
+The Matlab script is provided in Appendix \ref{app:em_matlab}.
+\label{fig:em_plot}
+\end{figure}
+
+
+% see octave/engine_model.m for these calculations
+
+\clearpage
 \section{Regulator Control System}
 
 What is needed is a regulator system where the input is applied
@@ -253,12 +345,6 @@ The general system is shown in Figure \ref{fig:rpm1}.
 
 % TODO - steady state model
 
-
-%And the open loop controller, with a fixed input duty cycle, is shown
-%in Figure \ref{fig:openloop}.
-%Notice that in this example the torque has transient characteristics and
-%varies over time.
-%The output of this system is show in Figure \ref{fig:olplot}.
 
 % TODO - open loop performance
 
@@ -468,7 +554,7 @@ as given by Equation \ref{eq:dc2s} and shown in Figure \ref{fig:dc1s}.
 	y &= u + r \notag \\
 	r &= y \cdot z^{-1} \notag \\
 	y &= u + y z^{-1} \notag \\
-	y &= y(1 - z^{-1}) \notag \\
+	u &= y(1 - z^{-1}) \notag \\
 	\Aboxed{ \frac{y}{u} &= \frac{1}{1 - z^{-1}} } \label{eq:dc2s}
 \end{align}
 
@@ -477,7 +563,7 @@ as given by Equation \ref{eq:dc2s} and shown in Figure \ref{fig:dc1s}.
 \begin{center}
 
 \begin{tikzpicture}[>=triangle 60]
-\node[gain] (gain1) [] {$1 - z^{-1}$};
+	\node[gain] (gain1) [] {$\dfrac{1}{1 - z^{-1}}$};
 \draw [->] (-20mm,0) node[above,yshift=1mm]{$u$} -- (gain1.west);
 \draw [->] (gain1.east) -- (20mm,0) node[above,yshift=1mm]{$y$};
 \end{tikzpicture}
@@ -541,11 +627,17 @@ to delta system.},
 % }}}
 
 \clearpage
-\section{Linear Engine Model Plot Matlab Script}
-\label{app:olplot}
-\lstinputlisting[language=Matlab]{../matlab/linear_engine_model_plot.m}
+\section{Engine Model Matlab Source}
+\label{app:em_matlab}
 
-\section{Linear Engine Model Initialization Matlab Script}
-\lstinputlisting[language=Matlab]{../matlab/linear_engine_model_init.m}
+\lstinputlisting[
+	caption={Matlab source to calculate the engine model system with
+		zero torque.}
+	]{../octave/engine_model.m}
+
+\lstinputlisting[
+	caption={Matlab source to plot the response of engine model
+		with no control.}
+	]{../octave/engine_model_plot.m}
 
 \end{document}

@@ -194,17 +194,65 @@ Its derivation is given in Appendix \ref{app:dsderiv}.}
 \end{figure}
 % }}}
 
-% TODO - delta to steady state
+Typical control systems have an associated time step.
+And the choice of this time step is crucial in determining performance
+with regard to the Nyquist frequency.
+However this model does not suffer from this issue because it is
+inherently discrete.
+A single ignition event of the engine corresponds to a single
+step of the model.
 
-Typical control systems have an associated time step which can be
-varied and is crucial in determining the performance of
-the controller with regard to the Nyquist frequency.
-This model has no such constraint because one calculation step
-corresponds directly to one engine ignition event.
-The controller is effectively running at the same ``clock speed'' as
-the engine.
+% TODO - reduced steady state system
+
+Typical control system models have a single input and a single output
+\footnote{One input/output could also be a vector.}.
+However this model is different in that it takes
+two inputs: control and torque (Figure \ref{fig:lem}).
+One way to reduce the model to a single input single output is to hold
+one of the inputs constant.
+However neither of the resulting use cases would make any sense to
+a designer whose primary goal is to stabilize engine rpm.
+The first case, with torque constant, would indicate the response for
+control inputs.
+But this is pointless because the goal of idle stabilization is to
+regulate the rpm given changes in torque.
+The second case, with control held constant, would indicate the response
+for a change in torque.
+But again this would provide no useful way to stabilize engine rpm.
+Both inputs are needed in order to construct any viable control system.
+
+\section{Regulator Control System}
+
+What is needed is a regulator system where the input is applied
+as torque.
+The general system is shown in Figure \ref{fig:rpm1}.
+
+% {{{ engine regulator system
+\begin{figure}[hbp!]
+\begin{center}
+
+\begin{tikzpicture}[>=triangle 60, scale=0.8,
+	node distance=14mm, auto]
+
+	\node[gain] 	(engine)	[]					{engine};
+	\node[gain] 	(control)	[below=of engine]	{controller};
+
+	\draw [<-] (engine.north) -- ++(0,10mm) node[above]{$\text{torque}$};
+	\draw [->] (engine.east) node[above,xshift=7mm]{rpm}
+					-- ++(20mm,0)
+					|- (control.east);
+	\draw [->] (control.west)
+					-- ++(-20mm,0)
+					|- (engine.west) node[above,xshift=-9mm]{control};
+\end{tikzpicture}
+
+\end{center}
+\caption{General system for regulating engine rpm.}\label{fig:rpm1}
+\end{figure}
+% }}}
 
 % TODO - steady state model
+
 
 %And the open loop controller, with a fixed input duty cycle, is shown
 %in Figure \ref{fig:openloop}.
@@ -214,26 +262,6 @@ the engine.
 
 % TODO - open loop performance
 
-%\begin{figure}[!htbp]
-%\begin{center}
-%\includegraphics[scale=0.5]{img/schematic-no_control-ed1}
-%\end{center}
-%\caption{Linear engine model with an open loop controller.
-%Inputs go through the simple controller to provide steps to the
-%engine model.
-%The output rpm, since it is in steps ($\Delta N$), is accumulated.}
-%\label{fig:openloop}
-%\end{figure}
-
-%\begin{figure}
-%\begin{center}
-%\includegraphics[scale=0.8]{img/linear_engine_model_no_control_plot}
-%\end{center}
-%%\caption{Output of linear engine controller with a transient torque
-%input and a fixed input duty cycle.  Matlab source given in
-%Appendix \ref{app:olplot}}
-%\label{fig:olplot}
-%\end{figure}
 
 % References
 \clearpage

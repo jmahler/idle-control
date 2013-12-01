@@ -72,8 +72,8 @@
 
 \thispagestyle{empty}
 
-\centerline{\Large \textbf{A Survey of Control Systems Applied to}}
-\centerline{\Large \textbf{the Idle Control of an Automotive Engine}}
+\centerline{\Large \textbf{A Survey of Control Systems for Stabilizing}}
+\centerline{\Large \textbf{the Idle of a Spark Ignition Engine}}
 \vspace{0.1in}
 \centerline{\normalsize {Jeremiah Mahler}}
 \centerline{\small {\href{mailto:jmahler@mail.csuchico.edu}{jmahler@mail.csuchico.edu}} }
@@ -107,6 +107,7 @@ various state space designs.
 \end{abstract}
 % }}}
 
+% {{{ Engine Model
 \section{Engine Model}
 
 The engine model used here is based work
@@ -307,6 +308,7 @@ to delta and vice versa.}
 \end{figure}
 % }}}
 
+% {{{ fig:em_plot
 \begin{figure}[htbp!]
 \begin{center}
 \includegraphics[scale=0.7]{../octave/engine_model_plot}
@@ -318,7 +320,55 @@ rpm near 900.\protect\footnotemark}
 \label{fig:em_plot}
 \end{figure}
 \footnotetext{The Matlab source to produced these plots is in Appendix \ref{app:em_matlab}.}
+% }}}
 
+% }}}
+
+It is not apparent from Figure \ref{fig:em_plot} exactly how long
+this process takes.
+The $x$ axis represents ignition events, not time.
+The rpm can be converted to time per ignition event by examining
+the units as shown in Equation \ref{eq:rpmtime}.
+
+\begin{align}
+\frac{1}{x \frac{\text{rev}}{\text{min}}
+			\cdot n \frac{\text{ign}}{\text{rev}}
+			\cdot \frac{\text{min}}{60\text{sec}}
+		}
+&= y \frac{\text{sec}}{\text{ign}} \label{eq:rpmtime} \\
+& \notag \\
+	\frac{\text{rev}}{\text{min}} &: \text{revolutions per minute (rpm)} \notag \\
+	\frac{\text{ign}}{\text{rev}} &: \text{number ignition points per revolution (4 for 8 cylinder engine)} \notag \\
+	\frac{\text{sec}}{\text{ign}} &: \text{seconds per ignition point} \notag
+\end{align}
+
+Applying this equation results in the response shown
+in Figure \ref{fig:rpmtime_plot}.
+It can be seen that this plot reveals that it taks over two seconds
+for the system to stabilize with no control.
+Clearly this is unacceptably slow and it is likely that with
+the application of a controller its performance can be improved.
+
+% {{{ fig:rpmtime_plot
+\begin{figure}[htbp!]
+\begin{center}
+\includegraphics[scale=0.7]{../octave/engine_model_rpmtime_plot}
+\end{center}
+\caption{Engine rpm response compared to time with a constant
+0.65 input control.\protect\footnotemark}
+\label{fig:rpmtime_plot}
+\end{figure}
+\footnotetext{The Matlab source of the RPM vs time plot is in Appendix \ref{app:rpmtime_plot_source}.}
+% }}}
+
+\clearpage
+
+% {{{ Pole Placement
+\section{Pole Placement}
+
+% }}}
+
+% {{{ Regulator Control System
 \clearpage
 \section{Regulator Control System}
 
@@ -326,7 +376,7 @@ What is needed is a regulator system where the input is applied
 as torque.
 The general system is shown in Figure \ref{fig:rpm1}.
 
-% {{{ engine regulator system
+% {{{ fig:rpm1, Regulator System
 \begin{figure}[hbp!]
 \begin{center}
 
@@ -350,11 +400,7 @@ The general system is shown in Figure \ref{fig:rpm1}.
 \end{figure}
 % }}}
 
-% TODO - steady state model
-
-
-% TODO - open loop performance
-
+% }}}
 
 % References
 \clearpage
@@ -636,6 +682,7 @@ to delta system.},
 \clearpage
 \section{Engine Model Matlab Source}
 \label{app:em_matlab}
+\label{app:rpmtime_plot_source}
 
 \lstinputlisting[
 	caption={Matlab source to calculate the engine model system with
@@ -646,5 +693,11 @@ to delta system.},
 	caption={Matlab source to plot the response of engine model
 		with no control.}
 	]{../octave/engine_model_plot.m}
+
+\clearpage
+\lstinputlisting[
+	caption={Matlab source to plot the response of engine model
+		versus time.}
+	]{../octave/engine_model_rpmtime_plot.m}
 
 \end{document}

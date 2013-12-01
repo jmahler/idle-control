@@ -216,8 +216,8 @@ step of the model.
 In order to build a controller the model needs to be simplified
 but the presence of two inputs complicates matters.
 To resolve this issue the torque can be set zero.
-With this change it can be simplified by first recognizing that
-it matches the form shown in Figure \ref{fig:dd} which
+Then it can be simplified by recognizing that it matches
+the well known form shown in Figure \ref{fig:dd} which
 has the transfer function in Equation \ref{eq:dd}.
 
 % {{{ dd figure
@@ -260,8 +260,8 @@ First taking the parts from the engine model (Figure \ref{fig:lem}).
 \end{align*}
 
 \begin{samepage}
-Then substituting them in to Equation \ref{eq:dd} results in
-the simplified from of Equation \ref{eq:lems}.
+Then substituting them in to Equation \ref{eq:dd} and simplifying
+results in Equation \ref{eq:lems}.
 \begin{align}
 	\frac{y}{u} &= \frac{(1.699) (8.5683) (2.98) (1)}
 		{(z^2 - 0.9025z)(z - 0.9354)(1) + (8.5683)(2.98)(0.00093)} \notag \\
@@ -272,8 +272,10 @@ the simplified from of Equation \ref{eq:lems}.
 
 \begin{samepage}
 It is still necessary to address the delta inputs and outputs.
-It can be seen in Figure \ref{fig:nodelta} that there is a beneficial
-side effect which makes this trivial.
+This can be resolved by placing the conversion transforms,
+from Figure \ref{fig:sdtf} and \ref{fig:dstf}, on either
+end of the engine model transfer function as shown in Figure \ref{fig:nodelta}.
+A beneficial side effect becomes apparent in this form.
 The transform that converts from steady state to a delta cancels
 with the transform that converts from a delta to steady state
 \footnote{In the more general case, when torque is non zero,
@@ -322,8 +324,6 @@ rpm near 900.\protect\footnotemark}
 \footnotetext{The Matlab source to produced these plots is in Appendix \ref{app:em_matlab}.}
 % }}}
 
-% }}}
-
 It is not apparent from Figure \ref{fig:em_plot} exactly how long
 this process takes.
 The $x$ axis represents ignition events, not time.
@@ -344,10 +344,10 @@ the units as shown in Equation \ref{eq:rpmtime}.
 
 Applying this equation results in the response shown
 in Figure \ref{fig:rpmtime_plot}.
-It can be seen that this plot reveals that it taks over two seconds
-for the system to stabilize with no control.
-Clearly this is unacceptably slow and it is likely that with
-the application of a controller its performance can be improved.
+It can be seen it takes over two seconds for the system to
+stabilize with no control.
+Clearly this is unacceptably slow and performance could be
+improved by using a controller.
 
 % {{{ fig:rpmtime_plot
 \begin{figure}[htbp!]
@@ -359,6 +359,63 @@ the application of a controller its performance can be improved.
 \label{fig:rpmtime_plot}
 \end{figure}
 \footnotetext{The Matlab source of the RPM vs time plot is in Appendix \ref{app:rpmtime_plot_source}.}
+% }}}
+
+There is yet another complication with this model.
+Typical systems are in a normalized so that it is possible to
+achieve an output of one given a step input.
+With this engine model an output of 1 rpm is an impossibly slow value.
+And an input of zero or one rpm are similarly impossible.
+
+To resolve this issue the values will be scaled in to a normal range.
+A normal idle rpm range is from 600 to 1200 rpm.
+To scale these values so that zero equals 600 and one equals 1000
+Equation \ref{eq:scale} can be used.
+
+\begin{align}
+	y &= \frac{1}{400}x - \frac{3}{2} \label{eq:scale}
+\end{align}
+
+Figure \ref{fig:stable} shows the stable rpms for a given control input.
+Its behavior is described by Equation \ref{eq:stable}.
+
+\begin{align}
+	y &= 1450.1 x \label{eq:stable}
+\end{align}
+
+% {{{ fig:stable
+\begin{figure}[htbp!]
+\begin{center}
+\includegraphics[scale=0.6]{../octave/stable_rpm_plot}
+\end{center}
+\caption{Stable rpm reached for a given constant control input.}
+\label{fig:stable}
+\end{figure}
+% }}}
+
+With these normalization corrections applied the response can be
+seen in Figure \ref{fig:normeng}.
+To avoid the zero rpm case it is allowed to stabilize before the
+step is applied.
+The lowest plot shows the response after the step.
+It takes slightly over one second to stabilize, which is better than
+the inaccurate case from zero rpm, but it is still slow and can
+be improved.
+
+% {{{ fig:normeng
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.7]{../octave/norm_engine_model_plot}
+\includegraphics[scale=0.55]{../octave/norm_engine_plot_close}
+\end{center}
+\caption{Normalized engine model response.  After it stabilizes
+at unit step is applied to produce the normalized response.
+The lowest plot is a close up of the step response in the center
+plot.}
+\label{fig:normeng}
+\end{figure}
+% }}}
+
 % }}}
 
 \clearpage
@@ -401,6 +458,9 @@ The general system is shown in Figure \ref{fig:rpm1}.
 % }}}
 
 % }}}
+
+\clearpage
+\section{Conclusion}
 
 % References
 \clearpage
@@ -699,5 +759,18 @@ to delta system.},
 	caption={Matlab source to plot the response of engine model
 		versus time.}
 	]{../octave/engine_model_rpmtime_plot.m}
+
+\clearpage
+\lstinputlisting[
+	caption={Matlab source to plot the response of the normalized engine model.}
+	]{../octave/norm_engine_model_plot.m}
+
+\clearpage
+\lstinputlisting[
+	caption={Matlab source to plot the response of the normalized engine model
+	after step is applied.}
+	]{../octave/norm_engine_plot_close.m}
+
+
 
 \end{document}

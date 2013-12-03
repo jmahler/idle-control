@@ -51,6 +51,10 @@
 \raggedright
 %\setlength{\parindent}{0.2in}
 
+% prevent breaks in the middle of paragraphs
+\widowpenalties 1 10000
+\raggedbottom
+
 %
 % backend	: biber
 % style		: numeric
@@ -99,8 +103,10 @@ Any time an accessory is turned on/off the torque applied to
 the engine changes.
 And changes in torque will change the engine rpm if the control
 inputs are constant.
-This paper shows how control systems methods can be applied to
+This paper shows how control system methods can be applied to
 the problem of idle stabilization.
+Because the engine model is inherently discrete all of the methods
+used are also discrete.
 Methods include: pole placement, direct design, and
 various state space designs.
 
@@ -359,61 +365,6 @@ improved by using a controller.
 \label{fig:rpmtime_plot}
 \end{figure}
 \footnotetext{The Matlab source of the RPM vs time plot is in Appendix \ref{app:rpmtime_plot_source}.}
-% }}}
-
-There is yet another complication with this model.
-Typical systems are in a normalized so that it is possible to
-achieve an output of one given a step input.
-With this engine model an output of 1 rpm is an impossibly slow value.
-And an input of zero or one rpm are similarly impossible.
-
-To resolve this issue the values will be scaled in to a normal range.
-A normal idle rpm range is from 600 to 1200 rpm.
-To scale these values so that zero equals 600 and one equals 1000
-Equation \ref{eq:scale} can be used.
-
-\begin{align}
-	y &= \frac{1}{400}x - \frac{3}{2} \label{eq:scale}
-\end{align}
-
-Figure \ref{fig:stable} shows the stable rpms for a given control input.
-Its behavior is described by Equation \ref{eq:stable}.
-
-\begin{align}
-	y &= 1450.1 x \label{eq:stable}
-\end{align}
-
-% {{{ fig:stable
-\begin{figure}[htbp!]
-\begin{center}
-\includegraphics[scale=0.6]{../octave/stable_rpm_plot}
-\end{center}
-\caption{Stable rpm reached for a given constant control input.}
-\label{fig:stable}
-\end{figure}
-% }}}
-
-With these normalization corrections applied the response can be
-seen in Figure \ref{fig:normeng}.
-To avoid the zero rpm case it is allowed to stabilize before the
-step is applied.
-The lowest plot shows the response after the step.
-It takes slightly over one second to stabilize, which is better than
-the inaccurate case from zero rpm, but it is still slow and can
-be improved.
-
-% {{{ fig:normeng
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.7]{../octave/norm_engine_model_plot}
-\includegraphics[scale=0.55]{../octave/norm_engine_plot_close}
-\end{center}
-\caption{Normalized engine model response.  After it stabilizes
-at unit step is applied to produce the normalized response.
-The lowest plot is a close up of the step response in the center
-plot.}
-\label{fig:normeng}
-\end{figure}
 % }}}
 
 % }}}

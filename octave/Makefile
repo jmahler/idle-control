@@ -5,7 +5,8 @@ all: cd1_plot.pdf cd2_plot.pdf \
 		engine_model_rpmtime_plot.pdf \
 		stable_rpm_plot.pdf \
 		norm_engine_model_plot.pdf \
-		norm_engine_plot_close.pdf
+		norm_engine_plot_close.pdf \
+		em_shift_plot2.pdf
 
 %.eps: %.m
 	octave $<

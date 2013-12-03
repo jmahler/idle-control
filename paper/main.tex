@@ -120,16 +120,14 @@ The engine model used here is based work
 by Butts and Sivashankar\autocite{532315} which was derived from
 the work by Powell and Cook\autocite{4789342}.
 The configuration is a modern 4.6L V-8 gas engine.
-A single control input representing the idle air bypass valve 
-
-To simplify analysis the linearized model is used as shown in
+To simplify this analysis the linearized model was used as shown in
 Figure \ref{fig:lem}.
 
 % {{{ fig:lem
 \begin{figure}[hbp!]
 \begin{center}
 
-\begin{tikzpicture}[>=triangle 60, scale=0.7,
+\begin{tikzpicture}[>=triangle 60, scale=0.6,
 	node distance=14mm, auto]
 
 	\node[gain] 	(gain1)	[]					{$1.699$};
@@ -139,12 +137,13 @@ Figure \ref{fig:lem}.
 	\node[gain] 	(gain3)	[right=of sum2]		{$\dfrac{2.98}{z - 0.9354}$};
 	\node[gain] 	(gain4)	[below=of sum2]		{$0.00093$};
 
-	\draw [->] (-20mm,0) node[above]{$\Delta \text{control}$} -- (gain1.west);
+	\draw [->] (-30mm,0) node[above,xshift=2mm,yshift=1mm]{$\Delta \text{control}$}
+				-- (gain1.west);
 	\draw [->] (gain1) -- (sum1);
 	\draw [->] (sum1) -- (gain2);
 	\draw [->] (gain2) -- (sum2);
 	\draw [->] (sum2) -- (gain3);
-	\draw [->] (gain3.east) -- ++(20mm,0) node[above]{$\Delta \text{rpm}$};
+	\draw [->] (gain3.east) -- ++(30mm,0) node[above,xshift=-5mm,yshift=1mm]{$\Delta \text{rpm}$};
 	\draw [->] ($(gain3.east) + (10mm,0) $) |- (gain4.east);
 	\draw [->] (gain4.west) -| (sum1.south);
 	\draw [<-] (sum2.north) -- ++(0,10mm) node[above]{$\Delta \text{torque}$};
@@ -161,21 +160,22 @@ the engine causing it to slow down.
 The idle control signal is some fraction of unity.
 This fraction corresponds to a pulse width modulated idle control valve
 which is at a minimum near zero and at a maximum near unity.
-Often the duty cycle range is in a range from 0\% to 100\% which
-corresponds to 0 to 1 (unity).
 
 Because all the inputs and outputs are defined as deltas ($\Delta$)
 this model cannot be used directly with typical control systems
-which use steady state values.
-It is possible convert these deltas to steady state equivalents.
+which expect steady state values.
+It is possible to convert these deltas to steady state equivalents.
 Figure \ref{fig:sdtf} shows the transfer function to convert steady
-state values to delta values.
+state values to delta values
+\footnote{The derivation of the steady state to delta conversion
+is given in Appendix \ref{app:cdelta}}.
 Figure \ref{fig:dstf} shows the transfer function to delta values
-to steady state values.
+to steady state values
+\footnote{The derivation of the delta to steady state conversion
+is given in Appendix \ref{app:dsderiv}.}.
 
 % {{{ fig:sdtf
 \begin{figure}[!htbp]
-
 \begin{center}
 \begin{tikzpicture}[>=triangle 60]
 \node[gain] (gain1) [] {$1 - z^{-1}$};
@@ -183,13 +183,11 @@ to steady state values.
 \draw [->] (gain1.east) -- (20mm,0) node[above,yshift=1mm]{$\Delta X$};
 \end{tikzpicture}
 \end{center}
-
-\caption{The $Z$ transform used to accumulate the input and convert
-a steady state input to delta output.
-Its derivation is given in Appendix \ref{app:cdelta}.}
+\caption[xyz]{The $Z$ transform used to accumulate the input and convert
+a steady state input to delta output.}
 \label{fig:sdtf}
-
 \end{figure}
+
 % }}}
 
 % {{{ fig:dstf
@@ -204,8 +202,7 @@ Its derivation is given in Appendix \ref{app:cdelta}.}
 \end{center}
 
 \caption{The $Z$ transform used to convert delta input to a steady
-state output.
-Its derivation is given in Appendix \ref{app:dsderiv}.}
+state output.}
 \label{fig:dstf}
 
 \end{figure}
@@ -219,10 +216,9 @@ inherently discrete.
 A single ignition event of the engine corresponds to a single
 step of the model.
 
-% TODO - reduced steady state system
-
-In order to build a controller the model needs to be simplified
-but the presence of two inputs complicates matters.
+In order to construct a controller the model (Figure \ref{fig:lem})
+needs to be simplified in to a transfer function.
+However the prescence of two inputs, control and torque, complicates matters.
 To resolve this issue the torque can be set zero.
 Then it can be simplified by recognizing that it matches
 the well known form shown in Figure \ref{fig:dd} which
@@ -259,7 +255,7 @@ the plant and $D$ is the controller.}
 \frac{y}{u} &= K \frac{B \alpha}{A \alpha + B \beta} \label{eq:dd}
 \end{align}
 
-First taking the parts from the engine model (Figure \ref{fig:lem}).
+To simply first gather the parts from the engine model (Figure \ref{fig:lem}).
 
 \begin{align*}
 	\frac{B}{A} &= \frac{8.5683}{(z^2 - 0.9025z)} \frac{2.98}{(z - 0.9354)} \\
@@ -268,8 +264,8 @@ First taking the parts from the engine model (Figure \ref{fig:lem}).
 \end{align*}
 
 \begin{samepage}
-Then substituting them in to Equation \ref{eq:dd} and simplifying
-results in Equation \ref{eq:lems}.
+Then substitute them in to Equation \ref{eq:dd} and simplify.
+The result is Equation \ref{eq:lems}.
 \begin{align}
 	\frac{y}{u} &= \frac{(1.699) (8.5683) (2.98) (1)}
 		{(z^2 - 0.9025z)(z - 0.9354)(1) + (8.5683)(2.98)(0.00093)} \notag \\
@@ -280,17 +276,19 @@ results in Equation \ref{eq:lems}.
 
 \begin{samepage}
 It is still necessary to address the delta inputs and outputs.
-This can be resolved by placing the conversion transforms,
-from Figure \ref{fig:sdtf} and \ref{fig:dstf}, on either
-end of the engine model transfer function as shown in Figure \ref{fig:nodelta}.
+This can be resolved by placing the conversion transforms
+(from Figure \ref{fig:sdtf} and \ref{fig:dstf}) on either
+end of the engine model as shown in Figure \ref{fig:nodelta}.
 A beneficial side effect becomes apparent in this form.
 The transform that converts from steady state to a delta cancels
 with the transform that converts from a delta to steady state
-\footnote{In the more general case, when torque is non zero,
-the transforms would not cancel.}.
+\footnote{In the more general case, when torque is not zero,
+the transforms wouldn't cancel.}.
 Therefore the final transform is still Equation \ref{eq:lems}.
 An example of the output response with no control is shown in
 Figure \ref{fig:em_plot}.
+The Matlab source code for this plot and others are
+in Appendix \ref{app:em_matlab}.
 \end{samepage}
 
 % {{{ fig:nodelta
@@ -326,17 +324,15 @@ to delta and vice versa.}
 \caption{Output response of engine model with no control.
 The control can range from zero to one.
 Here the control is constant at 0.65 which resulted in a stable
-rpm near 900.\protect\footnotemark}
+rpm near 900.}
 \label{fig:em_plot}
 \end{figure}
-\footnotetext{The Matlab source for this and the other engine model plots
-are in Appendix \ref{app:em_matlab}.}
 % }}}
 
 It is not apparent from Figure \ref{fig:em_plot} exactly how long
-this process takes.
-The $x$ axis represents ignition events, not time.
-The rpm can be converted to time per ignition event by examining
+this process takes because the $x$ axis represents ignition events
+instead of time.
+However the rpm can be converted to time per ignition event by examining
 the units as shown in Equation \ref{eq:rpmtime}.
 
 \begin{align}
@@ -351,9 +347,9 @@ the units as shown in Equation \ref{eq:rpmtime}.
 	\frac{\text{sec}}{\text{ign}} &: \text{seconds per ignition point} \notag
 \end{align}
 
-Applying this equation results in the response shown
+Applying Equation \ref{eq:rpmtime} results in the response shown
 in Figure \ref{fig:rpmtime_plot}.
-It can be seen that the rise time over $0.5$ second and
+It can be seen that the rise time is over $0.5$ second and
 that the overshoot is close to $40\%$.
 The stabilization time is also several seconds.
 Clearly its performance could be improved with the application
@@ -373,7 +369,6 @@ of a controller.
 The response from zero rpm is not a realistic measurement of performance
 because zero rpm is impossibly slow.
 A typical idle rpm range is from 600 to 1000 rpm.
-
 Figure \ref{fig:em_shift_plot2} shows the response for a step input
 with control inputs chosen to reach 600 and 1000 rpm
 \footnote{The control input to stable rpm values are given in

@@ -19,7 +19,7 @@ for i = 1:length(us)
 	y(i) = yp(end);	
 endfor
 
-figure;
+figure(1);
 
 plot(us, y, '-o');
 grid on;

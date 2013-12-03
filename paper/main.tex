@@ -125,6 +125,7 @@ A single control input representing the idle air bypass valve
 To simplify analysis the linearized model is used as shown in
 Figure \ref{fig:lem}.
 
+% {{{ fig:lem
 \begin{figure}[hbp!]
 \begin{center}
 
@@ -152,6 +153,7 @@ Figure \ref{fig:lem}.
 \end{center}
 \caption{Linear engine model of a modern 4.6L V-8.}\label{fig:lem}
 \end{figure}
+% }}}
 
 This model takes two inputs: a torque, and a idle control signal.
 When the torque is greater than zero it will oppose the rotation of
@@ -327,7 +329,8 @@ Here the control is constant at 0.65 which resulted in a stable
 rpm near 900.\protect\footnotemark}
 \label{fig:em_plot}
 \end{figure}
-\footnotetext{The Matlab source to produced these plots is in Appendix \ref{app:em_matlab}.}
+\footnotetext{The Matlab source for this and the other engine model plots
+are in Appendix \ref{app:em_matlab}.}
 % }}}
 
 It is not apparent from Figure \ref{fig:em_plot} exactly how long
@@ -350,10 +353,11 @@ the units as shown in Equation \ref{eq:rpmtime}.
 
 Applying this equation results in the response shown
 in Figure \ref{fig:rpmtime_plot}.
-It can be seen it takes over two seconds for the system to
-stabilize with no control.
-Clearly this is unacceptably slow and performance could be
-improved by using a controller.
+It can be seen that the rise time over $0.5$ second and
+that the overshoot is close to $40\%$.
+The stabilization time is also several seconds.
+Clearly its performance could be improved with the application
+of a controller.
 
 % {{{ fig:rpmtime_plot
 \begin{figure}[htbp!]
@@ -361,10 +365,32 @@ improved by using a controller.
 \includegraphics[scale=0.7]{../octave/engine_model_rpmtime_plot}
 \end{center}
 \caption{Engine rpm response compared to time with a constant
-0.65 input control.\protect\footnotemark}
+0.65 input control.}
 \label{fig:rpmtime_plot}
 \end{figure}
-\footnotetext{The Matlab source of the RPM vs time plot is in Appendix \ref{app:rpmtime_plot_source}.}
+% }}}
+
+The response from zero rpm is not a realistic measurement of performance
+because zero rpm is impossibly slow.
+A typical idle rpm range is from 600 to 1000 rpm.
+
+Figure \ref{fig:em_shift_plot2} shows the response for a step input
+with control inputs chosen to reach 600 and 1000 rpm
+\footnote{The control input to stable rpm values are given in
+Appendix \ref{app:contrpm}}.
+This is a more realistic representation of typical operation.
+The rise time is near $0.2$ seconds and the overshoot is $15\%$.
+And the stabilization time is almost one second.
+Its behavior can still be improved with a controller.
+
+% {{{ fig:em_shift_plot2
+\begin{figure}[htbp!]
+\begin{center}
+\includegraphics[scale=0.6]{../octave/em_shift_plot2}
+\end{center}
+\caption{Response for a shifted and scaled step input with zero torque.}
+\label{fig:em_shift_plot2}
+\end{figure}
 % }}}
 
 % }}}
@@ -690,6 +716,7 @@ to delta system.},
 
 % }}}
 
+% {{{ Engine Model Matlab Source
 \clearpage
 \section{Engine Model Matlab Source}
 \label{app:em_matlab}
@@ -705,6 +732,7 @@ to delta system.},
 		with no control.}
 	]{../octave/engine_model_plot.m}
 
+% XXX
 \clearpage
 \lstinputlisting[
 	caption={Matlab source to plot the response of engine model
@@ -713,15 +741,37 @@ to delta system.},
 
 \clearpage
 \lstinputlisting[
-	caption={Matlab source to plot the response of the normalized engine model.}
-	]{../octave/norm_engine_model_plot.m}
+	caption={Matlab source to plot the response of engine model
+		versus time for a shifted/scaled step input.}
+	]{../octave/em_shift_plot2.m}
+% }}}
+
+\clearpage
+\section{Control Response}
+\label{app:contrpm}
+
+For a given control input with zero torque the stable rpm values reached
+are shown in Figure \ref{fig:stable}.
+Equation \ref{eq:stable} describes its behavior.
+Listing \ref{lst:stable} shows how this was calculated.
+
+\begin{align}
+y &= 1450.1 x \label{eq:stable}
+\end{align}
+
+\begin{figure}[htbp!]
+\begin{center}
+\includegraphics[scale=0.5]{../octave/stable_rpm_plot}
+\end{center}
+\caption{Stable rpm reached for a given constant control input.}
+\label{fig:stable}
+\end{figure}
 
 \clearpage
 \lstinputlisting[
-	caption={Matlab source to plot the response of the normalized engine model
-	after step is applied.}
-	]{../octave/norm_engine_plot_close.m}
-
-
+	caption={Matlab source to find the stable rpm for a given
+		control input with zero torque.},
+	label={lst:stable}
+	]{../octave/stable_rpm_plot.m}
 
 \end{document}

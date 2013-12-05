@@ -1,15 +1,17 @@
 
-all: cd1_plot.pdf cd2_plot.pdf \
-		dc1_plot.pdf dc2_plot.pdf \
-		engine_model_plot.pdf \
-		engine_model_rpmtime_plot.pdf \
-		stable_rpm_plot.pdf \
-		norm_engine_model_plot.pdf \
-		norm_engine_plot_close.pdf \
-		em_shift_plot2.pdf
+all: 	cd_plot1.pdf \
+		cd_plot2.pdf \
+		dc_plot1.pdf \
+		dc_plot2.pdf \
+		dd_plot1.pdf \
+		dd_plot2.pdf \
+		em_plot1.pdf \
+		em_plot2.pdf \
+		em_plot3.pdf \
+		em_plot4.pdf
 
 %.eps: %.m
-	octave $<
+	octave --silent $<
 
 %.pdf: %.eps
 	epspdf $<

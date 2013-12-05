@@ -1,12 +1,14 @@
 %
-% dc1_plot.m
+% cd2_plot.m
 %
 
 clear;
 
-dc1_init;
+T = 1;  % time step
 
-u = [1 0 0 -4 0 5 3 3];
+sys = tf([1 -1], [1 0], T, 'inname', 'y1', 'outname', 'u1');
+
+u = [1 1 1 -3 -3 2 5 0];
 t = 0:(size(u,2)-1);  % start at zero
 
 figure;
@@ -22,4 +24,4 @@ lsim(sys, u);
 grid on;
 axis auto;
 
-print('dc1_plot.eps', '-deps');
+print('cd_plot2.eps', '-color', '-deps2');

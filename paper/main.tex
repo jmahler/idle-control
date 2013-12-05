@@ -319,7 +319,7 @@ to delta and vice versa.}
 % {{{ fig:em_plot
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.7]{../octave/engine_model_plot}
+\includegraphics[scale=0.7]{../octave/em_plot1}
 \end{center}
 \caption{Output response of engine model with no control.
 The control can range from zero to one.
@@ -358,7 +358,7 @@ of a controller.
 % {{{ fig:rpmtime_plot
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.7]{../octave/engine_model_rpmtime_plot}
+\includegraphics[scale=0.7]{../octave/em_plot2}
 \end{center}
 \caption{Engine rpm response compared to time with a constant
 0.65 input control.}
@@ -369,7 +369,7 @@ of a controller.
 The response from zero rpm is not a realistic measurement of performance
 because zero rpm is impossibly slow.
 A typical idle rpm range is from 600 to 1000 rpm.
-Figure \ref{fig:em_shift_plot2} shows the response for a step input
+Figure \ref{fig:em_plot4} shows the response for a step input
 with control inputs chosen to reach 600 and 1000 rpm
 \footnote{The control input to stable rpm values are given in
 Appendix \ref{app:contrpm}}.
@@ -378,13 +378,13 @@ The rise time is near $0.2$ seconds and the overshoot is $15\%$.
 And the stabilization time is almost one second.
 Its behavior can still be improved with a controller.
 
-% {{{ fig:em_shift_plot2
+% {{{ fig:em_plot4
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.6]{../octave/em_shift_plot2}
+\includegraphics[scale=0.6]{../octave/em_plot4}
 \end{center}
 \caption{Response for a shifted and scaled step input with zero torque.}
-\label{fig:em_shift_plot2}
+\label{fig:em_plot4}
 \end{figure}
 % }}}
 
@@ -392,8 +392,20 @@ Its behavior can still be improved with a controller.
 
 \clearpage
 
-% {{{ Pole Placement
-\section{Pole Placement}
+% {{{ Direct Design
+\section{Direct Design}
+
+% {{{ fig:dd_plot2
+\begin{figure}[htbp!]
+\begin{center}
+\includegraphics[scale=0.7]{../octave/dd_plot2}
+\end{center}
+\caption{Output response of controller built using Direct Design
+compared to no control.  For no control this is the same plot
+as in Figure \ref{fig:em_plot4} which stabilizes after a second.}
+\label{fig:dd_plot2}
+\end{figure}
+% }}}
 
 % }}}
 
@@ -494,21 +506,20 @@ input to a delta output.}
 
 % }}}
 
-Figure \ref{fig:cd1_plot} shows the response of this system given
+Figure \ref{fig:cd_plot1} shows the response of this system given
 an arbitrary input.
 It can be seen that if the input is held constant the output (delta)
 returns to zero as expected.
 
 \begin{figure}[htbp!]
-\includegraphics[scale=0.7]{../octave/cd1_plot}
+\includegraphics[scale=0.7]{../octave/cd_plot1}
 \caption{Response of full steady state input to delta output system
 to an arbitrary input signal.
 The upper plot is the input signal ($u$) and the lower plot is
 the output response ($y$).
-The Matlab source code is given in Listing \ref{lst:cd1_init}
-and \ref{lst:cd1_plot}.
+The Matlab source code is given in Listing \ref{lst:cd_plot1}.
 }
-\label{fig:cd1_plot}
+\label{fig:cd_plot1}
 \end{figure}
 
 \begin{samepage}
@@ -552,21 +563,20 @@ a delta output.}
 \label{fig:cd1s}
 \end{figure}
 
-It can be seen in Figure \ref{fig:cd2_plot} that the simplified system
-behaves identically to the previous system (Figure \ref{fig:cd1_plot}).
+It can be seen in Figure \ref{fig:cd_plot2} that the simplified system
+behaves identically to the previous system (Figure \ref{fig:cd_plot1}).
 
 \begin{figure}[htbp!]
-\includegraphics[scale=0.7]{../octave/cd2_plot}
+\includegraphics[scale=0.7]{../octave/cd_plot2}
 \caption{Response of simplified steady state input to delta output system
 to an arbitrary input signal.
 The upper plot is the input signal ($u$) and the lower plot is
 the output response ($y$).
-Response is identical to the full system in Figure \ref{fig:cd1_plot}
+Response is identical to the full system in Figure \ref{fig:cd_plot1}
 as expected.
-The Matlab source code is given in Listing \ref{lst:cd2_init}
-and \ref{lst:cd2_plot}.
+The Matlab source code is given in Listing \ref{lst:cd_plot2}.
 }
-\label{fig:cd2_plot}
+\label{fig:cd_plot2}
 \end{figure}
 
 \clearpage
@@ -576,26 +586,16 @@ and \ref{lst:cd2_plot}.
 The following code has been tested using Octave\autocite{octave},
 an open source Matlab clone.
 
-\lstinputlisting[caption={Matlab code to initialize the full
-steady state to delta system.},
-	label=lst:cd1_init
-	]{../octave/cd1_init.m}
-
 \lstinputlisting[caption={Matlab code to plot the full steady state
 to delta system.},
-	label=lst:cd1_plot
-	]{../octave/cd1_plot.m}
+	label=lst:cd_plot1
+	]{../octave/cd_plot1.m}
 
 \clearpage
-\lstinputlisting[caption={Matlab code to initialize the simplified
-steady state to delta system.},
-	label=lst:cd2_init
-	]{../octave/cd2_init.m}
-
 \lstinputlisting[caption={Matlab code to plot the simplified steady state
 to delta system.},
-	label=lst:cd2_plot
-	]{../octave/cd2_plot.m}
+	label=lst:cd_plot2
+	]{../octave/cd_plot2.m}
 
 % }}}
 
@@ -660,7 +660,7 @@ a steady state output.}
 \end{figure}
 % }}}
 
-Figure \ref{fig:dc2_plot} shows the response of this system given
+Figure \ref{fig:dc_plot2} shows the response of this system given
 an arbitrary input
 \footnote{This input is actually the output of the steady state input
 to delta output given in Appendix \ref{app:cdelta}.
@@ -668,17 +668,16 @@ They are equal and opposite as expected.}.
 It can be seen that the output is held in a steady state according
 to the delta inputs as expected.
 
-% {{{ fig:dc2_plot
+% {{{ fig:dc_plot2
 \begin{figure}[htbp!]
-\includegraphics[scale=0.7]{../octave/dc2_plot}
+\includegraphics[scale=0.7]{../octave/dc_plot2}
 \caption{Response of delta input to steady state output system
 when given an arbitrary input signal.
 The upper plot is the input signal ($u$) and the lower plot is
 the output response ($y$).
-The Matlab source code is given in Listing \ref{lst:dc2_init}
-and \ref{lst:dc2_plot}.
+The Matlab source code is given in Listing \ref{lst:dc_plot2}.
 }
-\label{fig:dc2_plot}
+\label{fig:dc_plot2}
 \end{figure}
 % }}}
 
@@ -689,25 +688,10 @@ and \ref{lst:dc2_plot}.
 The following code has been tested using Octave\autocite{octave},
 an open source Matlab clone.
 
-%\lstinputlisting[caption={Matlab code to initialize the full
-%steady state to delta system.},
-%	label=lst:dc1_init
-%	]{../octave/dc1_init.m}
-%
-%\lstinputlisting[caption={Matlab code to plot the full steady state
-%to delta system.},
-%	label=lst:dc1_plot
-%	]{../octave/dc1_plot.m}
-
-\lstinputlisting[caption={Matlab code to initialize the simplified
-steady state to delta system.},
-	label=lst:dc2_init
-	]{../octave/dc2_init.m}
-
 \lstinputlisting[caption={Matlab code to plot the simplified steady state
 to delta system.},
-	label=lst:dc2_plot
-	]{../octave/dc2_plot.m}
+	label=lst:dc_plot2
+	]{../octave/dc_plot2.m}
 
 % }}}
 
@@ -719,28 +703,42 @@ to delta system.},
 
 \lstinputlisting[
 	caption={Matlab source to calculate the engine model system with
-		zero torque.}
+		zero torque.  This function is called by other scripts that
+	use this model.}
 	]{../octave/engine_model.m}
 
 \lstinputlisting[
 	caption={Matlab source to plot the response of engine model
-		with no control.}
-	]{../octave/engine_model_plot.m}
+		with no control. The $x$ axis is in ticks.}
+	]{../octave/em_plot1.m}
 
 % XXX
 \clearpage
 \lstinputlisting[
 	caption={Matlab source to plot the response of engine model
-		versus time.}
-	]{../octave/engine_model_rpmtime_plot.m}
+	with no control.  The $x$ axis is in time.}
+	]{../octave/em_plot2.m}
 
 \clearpage
 \lstinputlisting[
 	caption={Matlab source to plot the response of engine model
-		versus time for a shifted/scaled step input.}
-	]{../octave/em_shift_plot2.m}
+		versus time for a typical 600 to 1000 rpm range.}
+	]{../octave/em_plot4.m}
 % }}}
 
+% {{{ Direct Design Matlab Source
+\clearpage
+\section{Direct Design Matlab Source}
+\label{app:dd_matlab}
+
+\lstinputlisting[
+	caption={Matlab source used to plot the controller built using
+	Direct Design compared to no control.}
+	]{../octave/dd_plot2.m}
+
+% }}}
+
+% {{{ Control Response
 \clearpage
 \section{Control Response}
 \label{app:contrpm}
@@ -756,7 +754,7 @@ y &= 1450.1 x \label{eq:stable}
 
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.5]{../octave/stable_rpm_plot}
+\includegraphics[scale=0.5]{../octave/em_plot3}
 \end{center}
 \caption{Stable rpm reached for a given constant control input.}
 \label{fig:stable}
@@ -765,8 +763,9 @@ y &= 1450.1 x \label{eq:stable}
 \clearpage
 \lstinputlisting[
 	caption={Matlab source to find the stable rpm for a given
-		control input with zero torque.},
+		control input.},
 	label={lst:stable}
-	]{../octave/stable_rpm_plot.m}
+	]{../octave/em_plot3.m}
+% }}}
 
 \end{document}

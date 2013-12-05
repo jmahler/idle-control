@@ -1,10 +1,12 @@
 %
-% dc2_plot.m
+% dc_plot2.m
 %
 
 clear;
 
-dc2_init;
+T = 1;  % time step
+
+sys = tf([1 0], [1 -1], T, 'inname', 'u1', 'outname', 'y1');
 
 u = [1 0 0 -4 0 5 3 3];
 t = 0:(size(u,2)-1);  % start at zero
@@ -24,4 +26,4 @@ grid on;
 axis auto;
 axis([0 7 -4 6]);
 
-print('dc2_plot.eps', '-deps');
+print('dc_plot2.eps', '-color', '-deps2');

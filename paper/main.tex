@@ -45,8 +45,8 @@
 		xleftmargin=0.3in}
 
 \usepackage{sectsty}  % \sectionfont
-\sectionfont{\normalsize}
-\subsectionfont{\normalsize}
+%\sectionfont{\normalsize}
+%\subsectionfont{\normalsize}
 
 \raggedright
 %\setlength{\parindent}{0.2in}
@@ -76,25 +76,21 @@
 
 \thispagestyle{empty}
 
+\vspace*{1.0in}
 \centerline{\Large \textbf{Control System Design Applied to}}
 \centerline{\Large \textbf{Idle Stabilization of a Spark Ignition Engine}}
 \vspace{0.1in}
 \centerline{\normalsize {Jeremiah Mahler}}
 \centerline{\small {\href{mailto:jmahler@mail.csuchico.edu}{jmahler@mail.csuchico.edu}} }
 \vspace{0.1in}
-\centerline{\normalsize {CSU Chico}}
-%\centerline{\today}
-%\vspace{0.1in}
+\centerline{\normalsize {California State University Chico}}
 \centerline{\small \today}
-\vspace{0.2in}
-\centerline{\LARGE \textbf{DRAFT}}
-\vspace{0.2in}
+%\vspace{0.2in}
+%\centerline{\LARGE \textbf{DRAFT}}
+\vspace{0.5in}
 
-% }}}
+\vfill
 
-% {{{ abstract
-%\pagebreak
-%\thispagestyle{empty}
 \begin{abstract}
 \noindent
 The task of maintaining a stable idle for an internal combustion
@@ -109,11 +105,18 @@ Because the engine model is inherently discrete all of the methods
 used are also discrete.
 Methods include: pole placement, direct design, and
 various state space designs.
-
 \end{abstract}
+
+\vspace{1.5in}
+
 % }}}
 
+
+\clearpage
+\tableofcontents
+
 % {{{ Engine Model
+\clearpage
 \section{Engine Model}
 
 The engine model used here is based work
@@ -579,7 +582,7 @@ plot is given in Appendix \ref{app:dd_matlab}.}
 \end{figure}
 % }}}
 
-While these results were positive it is not obvious whether it is withing
+While this result is positive it is not apparent whether it is within
 the mechanical limits of a real engine.
 In particular the control input should be limited to a range from zero to one.
 Further investigation is needed to determine whether these limits
@@ -765,8 +768,7 @@ The Matlab source code is given in Listing \ref{lst:cd_plot2}.
 \subsection{Matlab Source}
 \label{app:cdsrc}
 
-The following code has been tested using Octave\autocite{octave},
-an open source Matlab clone.
+\nocite{octave}
 
 \lstinputlisting[caption={Matlab code to plot the full steady state
 to delta system.},
@@ -867,8 +869,7 @@ The Matlab source code is given in Listing \ref{lst:dc_plot2}.
 \subsection{Matlab Source}
 \label{app:dcsrc}
 
-The following code has been tested using Octave\autocite{octave},
-an open source Matlab clone.
+\nocite{octave}
 
 \lstinputlisting[caption={Matlab code to plot the simplified steady state
 to delta system.},
@@ -958,8 +959,8 @@ and other functions are given in Appendix \ref{app:gf_matlab}.
 \section{Control Response}
 \label{app:contrpm}
 
-For a given control input with zero torque the stable rpm values reached
-are shown in Figure \ref{fig:stable}.
+For a given control input and zero torque the engine model will
+reach stable rpm values as shown in Figure \ref{fig:stable}.
 Equation \ref{eq:stable} describes its behavior.
 Listing \ref{lst:stable} shows how this was calculated.
 

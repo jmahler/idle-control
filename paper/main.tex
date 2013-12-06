@@ -20,7 +20,7 @@
 %
 % control system tikz objects
 \tikzset{shadow/.style={drop shadow,fill=white}}
-\tikzset{sum/.style={circle,draw,very thick,shadow,minimum size=6mm}}
+\tikzset{sum/.style={circle,draw,very thick,shadow,minimum size=5mm}}
 \tikzset{sumnp/.style={sum,
 				label={{above left,xshift=0.0mm,yshift=-1.0mm}:$+$},
 				label={{below right,xshift=-1.0mm,yshift=0.0mm}:$-$}} }
@@ -395,17 +395,199 @@ Its behavior can still be improved with a controller.
 % {{{ Direct Design
 \section{Direct Design}
 
+There are several characteristics of this Direct Design method.
+The controller is built entirely in the discrete domain.
+If the plant ($G(z)$) is continuous it is converted to discrete
+using a Zero Order Hold.
+In this case it is already discrete.
+It is a pole placement technique where the desired roots of the
+entire system are specified by the designer.
+The controller values for $\beta$ and $\alpha$ are found using the
+Diophantine equation along with a Sylvester matrix.
+And the gain ($K$) is chosen such that the desired limit is reached.
+Figure \ref{fig:ddc} shows the structure of the system.
+
+% {{{ fig:ddc
+\begin{figure}[h!]
+
+\begin{center}
+\begin{tikzpicture}[>=triangle 60, scale=0.8,
+	node distance=20mm, auto]
+
+	\node[gain]		(K) 	[] 				{$K$};
+	\node[sumnp]	(sum1) 	[right of=K] 	{};
+	\node[gain]		(Gz) 	[right of=sum1]	{$G(z)$};
+	\node[gain]		(Dz) 	[below of=Gz] 	{$D(z)$};
+
+	\draw [<-] (K) -- ++(-20mm,0) node[above]{$u$};
+	\draw [->] (K) -- (sum1);
+	\draw [->] (sum1) -- (Gz);
+	\draw [<-] (sum1) |- (Dz);
+	\draw [->] (Gz) -- ++(35mm,0) node[above]{$y$};
+	\draw [->] (Gz) -- ++(20mm,0) |- (Dz.east);
+
+	% add B/A labels
+	\node [right of=Gz,node distance=0cm,xshift=9mm,yshift=6mm] {$\dfrac{B}{A}$};
+	\node [right of=Dz,node distance=0cm,xshift=9mm,yshift=6mm] {$\dfrac{\beta}{\alpha}$};
+\end{tikzpicture}
+\end{center}
+
+\caption{Direct Design system where $K$ is the scaling input, $G$ is
+the plant and $D$ is the controller.}
+\label{fig:ddc}
+\end{figure}
+% }}}
+
+In this case the roots were not given and no deterministic way
+was available to find them.
+So trial and error was used.
+
+\begin{align*}
+	\text{roots} &: z = 0.6 \pm 0.4i
+\end{align*}
+
+Since the plant is already in discrete form it is not necessary
+to use a Zero Order Hold.
+The engine model, repeated from Equation \ref{eq:lems}, is shown below.
+\begin{align*}
+G(z) &= \frac{43.38}{z^3 - 1.838 z^2 + 0.8442 z + 0.02375} \\
+	&= \frac{B(z)}{A(z)} = \frac{b_0 z^3 + b_1 z + b2}
+								{a_0 z^3 + a_1 z + a2}
+\end{align*}
+
+Next it must be arranged to place it in the form of the Diophantine Equation.
+
+From the block diagram the equation describing the system is found.
+\begin{align*}
+	\frac{y}{h} &= H \\
+	H &= K \frac{G}{1 + D G} \\
+	H &= K \frac{B \alpha}{A \alpha + B \beta}
+\end{align*}
+
+From the roots $D$ is constructed.
+\begin{align*}
+	D(z) &= (0.6 + 0.4i)(0.6 - 0.4i) \\
+	D(z) &= z^2 - 1.2z + 0.520
+\end{align*}
+
+Recall the form of the Diophantine Equation where the order is $n$.
+\[
+\begin{array}{ccccccc}
+	\alpha(z) &A(z) &+ &\beta(z) &B(z) &= &D \\
+	  (n-1)   &(n)  &  & (n-1)  &(n) & &(2n-1)
+\end{array}
+\]
+
+Since $A(z)$ is a third order polynomial $n = 3$.
+This requires that $D(z)$ be a fifth order polynomial ($2n-1$).
+The order is increased by adding zeros.
+
+\begin{align*}
+	D(z) &= z^5 - 1.2z^4 + 0.520z^3 \\
+		 &= d_0z^5 + d_1z^4 + d_2z^3 + d_3z^2 + d_4z + d_5
+\end{align*}
+
+This also requires that $\alpha$ and $\beta$ are
+second order polynomials ($n-1$).
+
+\begin{align*}
+	\frac{\beta}{\alpha} &= \frac{\beta_0 z^2 + \beta_1 z + \beta_2}
+								{\alpha_0 z^2 + \alpha_1 z + \alpha_2}
+\end{align*}
+
+To solve the Diophantine Equation
+
+\begin{align*}
+	M &= E^{-1} D \\
+	\left[
+	\begin{array}{l}
+		\alpha \\
+		\beta
+	\end{array}
+	\right] &= E^{-1} D \\
+	\left[
+	\begin{array}{l}
+		\alpha \\
+		\beta
+	\end{array}
+	\right] &= 
+	\left[
+	\begin{array}{l}
+		\alpha_2 \\
+		\alpha_1 \\
+		\alpha_0 \\
+		\beta_2 \\
+		\beta_1 \\
+		\beta_0
+	\end{array}
+	\right]
+\end{align*}
+
+a third order Sylvester Matrix is required.
+
+\[
+E=
+\begin{bmatrix}
+	a_3 & 0 & 0 & b_3 & 0 & 0 \\
+	a_2 & a_3 & 0 & b_2 & b_3 & 0 \\
+	a_1 & a_2 & a_3 & b_1 & b_2 & b_3 \\
+	a_0 & a_1 & a_2 & b_0 & b_1 & b_2 \\
+	0 & a_0 & a_1 & 0 & b_0 & b_1 \\
+	0 & 0 & a_0 & 0 & 0 & b_0 \\
+\end{bmatrix}
+\]
+
+Combining these parts and solving for $\alpha$ and $\beta$ results
+in a solution for $D(z)$.
+
+\begin{align*}
+	\Aboxed{
+	\frac{\beta}{\alpha} &= D(z) = \frac{0.02297 z^2 - 0.01686 z - 0.0004643}
+								{z^2 + 0.6379 z + 0.8482}
+	}
+\end{align*}
+
+\begin{samepage}
+The gain ($K$) still needs to be found and this can be accomplished
+using the limit.
+\begin{align*}
+\lim_{z \to 1} &K \frac{B \alpha}{A \alpha + B \beta} = 1\\
+\lim_{z \to 1} &K \frac{(43.38) (z^2 + 0.6379 z + 0.8482)}
+	{(z^5 - 1.2z^4 + 0.520z^3)} = 1 \\
+K &= \frac{(1 - 1.2 + 0.520)}{(43.38)(1 + 0.6379 + 0.8482)} \\
+\Aboxed{ K &= 0.0029671 }
+\end{align*}
+\end{samepage}
+
+This solution results in the response shown in Figure \ref{fig:dd_plot2}.
+It is a dramatic improvement compared to no control.
+The rise time, percent overshoot, and settling time are all improved.
+This result is particularly interesting because the chosen roots were a guess.
+It is likely that further improvement could be made by optimizing the roots.
+
 % {{{ fig:dd_plot2
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.7]{../octave/dd_plot2}
+\includegraphics[scale=0.6]{../octave/dd_plot2}
 \end{center}
 \caption{Output response of controller built using Direct Design
 compared to no control.  For no control this is the same plot
-as in Figure \ref{fig:em_plot4} which stabilizes after a second.}
+as in Figure \ref{fig:em_plot4} which stabilizes after a second.
+The Matlab source performing these calculations and producing this
+plot is given in Appendix \ref{app:dd_matlab}.}
 \label{fig:dd_plot2}
 \end{figure}
 % }}}
+
+While these results were positive it is not obvious whether it is withing
+the mechanical limits of a real engine.
+In particular the control input should be limited to a range from zero to one.
+Further investigation is needed to determine whether these limits
+are being exceeded.
+There is no doubt, however, that the addition of a controller
+improved performance.
+If the limits are being exceeded a different set of roots would have to
+be chosen which may be less optimal.
 
 % }}}
 
@@ -699,7 +881,6 @@ to delta system.},
 \clearpage
 \section{Engine Model Matlab Source}
 \label{app:em_matlab}
-\label{app:rpmtime_plot_source}
 
 \lstinputlisting[
 	caption={Matlab source to calculate the engine model system with
@@ -726,11 +907,45 @@ to delta system.},
 	]{../octave/em_plot4.m}
 % }}}
 
+% {{{ General Matlab Functions
+\clearpage
+\section{General Matlab Functions}
+\label{app:gf_matlab}
+
+This sections includes Matlab source for functions which are
+used among several methods.
+
+\lstinputlisting[
+	caption={Matlab source of function to calculate a Sylvester Matrix.} 
+	]{../octave/sylvester.m}
+
+\lstinputlisting[
+	caption={Matlab source of function to calculate zero time.} 
+	]{../octave/zerotime.m}
+
+\clearpage
+\lstinputlisting[
+	caption={Matlab source of modified lsim() function.} 
+	]{../octave/lsim1.m}
+
+% }}}
+
 % {{{ Direct Design Matlab Source
 \clearpage
 \section{Direct Design Matlab Source}
 \label{app:dd_matlab}
 
+Matlab source code used to build a controller using Direct Design
+and plot the output.
+The \verb+engine_model+ is given in Appendix \ref{app:em_matlab}
+and other functions are given in Appendix \ref{app:gf_matlab}.
+
+\lstinputlisting[
+	caption={Matlab source of function is to build a controller using
+		Direct Design.}
+	]{../octave/direct_design.m}
+
+\clearpage
 \lstinputlisting[
 	caption={Matlab source used to plot the controller built using
 	Direct Design compared to no control.}

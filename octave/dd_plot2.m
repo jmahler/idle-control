@@ -1,5 +1,5 @@
 %
-% dd_plot1.m
+% dd_plot2.m
 %
 % Plot of solution using direct design compared to no control.
 %
@@ -25,8 +25,7 @@ Gz1 = engine_model(T);
 % These roots are guess, taken from some other example.
 roots = [(0.6 + 0.4i) (0.6 - 0.4i) 0 0 0];
 order = 3;
-limit = 1;
-[Hz1, Dz1, K1] = direct_design(Gz1, roots, order, limit);
+[Hz1, Dz1, K1] = direct_design(Gz1, roots, order);
 
 % System with no control.
 Gz2 = engine_model(T);

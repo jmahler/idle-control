@@ -1,5 +1,5 @@
 %
-% cd2_plot.m
+% cd_plot2.m
 %
 
 clear;

@@ -36,8 +36,7 @@ Dz = tf(Beta, Alpha, T);
 % To find K, the limit should go to 1
 % for a step input.
 % (refer to the notes for a better description)
-K = sum(D)/sum(conv(Bz, Alpha));
-% XXX
+K = limit*polyval(D, limit)/polyval(conv(Bz, Alpha), limit);
 
 Hz = K*Gz/(1 + Dz*Gz);
 

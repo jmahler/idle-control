@@ -36,4 +36,4 @@ title('Engine Response With Control From 0.41 to 0.69');
 xlabel('time (sec)');
 ylabel('rpm');
 
-print('em_plot4.eps', '-color', '-deps2');
+print('em_plot4.eps', '-depsc2');

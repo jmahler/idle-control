@@ -46,4 +46,4 @@ title(sprintf('Output Response, step: %d - %d rpm', u_lo, u_hi));
 ylabel('rpm');
 xlabel('time (sec)');
 
-print('dd_plot1.eps', '-color', '-deps2');
+print('dd_plot1.eps', '-depsc2');

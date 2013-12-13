@@ -68,4 +68,4 @@ ylabel('rpm');
 xlabel('time (sec)');
 legend('no control', 'direct design');
 
-print('dd_plot2.eps', '-color', '-deps2');
+print('dd_plot2.eps', '-depsc2');

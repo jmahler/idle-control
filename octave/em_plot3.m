@@ -31,4 +31,4 @@ title('Stable Output Rpm');
 xlabel('control input');
 ylabel('rpm');
 
-print('em_plot3.eps', '-color', '-deps2');
+print('em_plot3.eps', '-depsc2');

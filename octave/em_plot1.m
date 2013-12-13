@@ -30,4 +30,4 @@ title('Output Response');
 ylabel('rpm');
 xlabel('ticks');
 
-print('em_plot1.eps', '-color', '-deps2');
+print('em_plot1.eps', '-depsc2');

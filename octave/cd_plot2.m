@@ -24,4 +24,4 @@ lsim(sys, u);
 grid on;
 axis auto;
 
-print('cd_plot2.eps', '-color', '-deps2');
+print('cd_plot2.eps', '-depsc2');

@@ -43,4 +43,4 @@ title('Output Response');
 ylabel('rpm');
 xlabel('time (sec)');
 
-print('em_plot2.eps', '-color', '-deps2');
+print('em_plot2.eps', '-depsc2');

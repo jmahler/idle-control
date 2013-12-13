@@ -26,4 +26,4 @@ grid on;
 axis auto;
 axis([0 7 -4 6]);
 
-print('dc_plot2.eps', '-color', '-deps2');
+print('dc_plot2.eps', '-depsc2');

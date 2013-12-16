@@ -596,13 +596,14 @@ be chosen which may be less optimal.
 
 % {{{ Regulator Control System
 \clearpage
-\section{Regulator Control System}
+\section{Regulator Control System, Control Law}
 
-What is needed is a regulator system where the input is applied
-as torque.
-The general system is shown in Figure \ref{fig:rpm1}.
+Instead of a servo system, which accepts a control input,
+a regulator system can be constructed which tries to maintain
+a single output value.  The general design is shown
+in Figure \ref{fig:reg1}.
 
-% {{{ fig:rpm1, Regulator System
+% {{{ fig:reg1, Regulator System
 \begin{figure}[hbp!]
 \begin{center}
 
@@ -622,7 +623,44 @@ The general system is shown in Figure \ref{fig:rpm1}.
 \end{tikzpicture}
 
 \end{center}
-\caption{General system for regulating engine rpm.}\label{fig:rpm1}
+\caption{Regulator system for idle rpm control.}\label{fig:reg1}
+\end{figure}
+% }}}
+
+One way to build this regulator system is to use the
+Control Law Design\autocite[Pg. 280]{franklin1998digital}.
+The block diagram of the system is shown in Figure \ref{fig:clff1}.
+
+% {{{ fig:clff1
+\begin{figure}[hpb!]
+\begin{center}
+
+\begin{tikzpicture}[>=triangle 60,
+	node distance=14mm, auto]
+
+	\node[gain]  	(Gz)	[] 	{$\begin{matrix}
+									\dot{x} = Ax + Bu \\
+										 y = Cx + Du
+								 \end{matrix}$};
+	\node[gain] 	(K)	[below=of Gz] 	{$-K$};
+
+	 \draw [->]
+	 		(Gz.east) -- ++(15mm,0)
+			-| ++(0,-10mm)
+			|- (K.east);
+
+	 \draw [<-]
+	 		(Gz.west) -- ++(-15mm,0)
+			-| ++(0,-10mm)
+			|- (K.west);
+
+\end{tikzpicture}
+
+\end{center}
+
+\caption{Control Law system with full feedback.
+It behaves as a regulator since not input is available.}
+\label{fig:clff1}
 \end{figure}
 % }}}
 

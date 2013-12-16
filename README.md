@@ -10,7 +10,7 @@ DESCRIPTION
 This paper investigates the application of control system
 techniques to automotive engine idle control.
 
-Download: [main.pdf](https://github.com/jmahler/idle-control/blob/master/paper/main.pdf?raw=true)
+Download: [main.pdf](https://github.com/jmahler/idle-control/blob/build/paper/main.pdf?raw=true)
 
 Many of the examples Matlab code for performing the calculations
 and plotting the response.  They have all been tested with

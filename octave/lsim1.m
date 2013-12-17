@@ -1,10 +1,10 @@
-function [y, t, x, i] = lsim1(Hz, u);
+function [y, t, x, i] = lsim1(Hz, u, t=[], x0=false);
 % LSIM1 - Just like lsim excpt small values are removed.
 %
 % "small" means less than or equal to 10.
 %
 
-[y, t, x] = lsim(Hz, u);
+[y, t, x] = lsim(Hz, u, t, x0);
 
 % Find the first valid value
 for i = 1:length(y) 

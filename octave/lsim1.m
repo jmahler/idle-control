@@ -20,5 +20,3 @@ u = u(i:end);
 t = t(i:end);
 
 i = i - 1;
-
-endfunction

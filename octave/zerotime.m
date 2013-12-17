@@ -7,5 +7,3 @@ ts = zeros(1,length(tx));
 for (i = 2:length(tx))
 	ts(i) = (tx(i) - tx(i-1)) + ts(i-1);
 end
-
-endfunction

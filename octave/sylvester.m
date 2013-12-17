@@ -30,4 +30,3 @@ function [E] = sylvester(A, B)
 			E(row, col) = B(i);
 		end
 	end
-endfunction

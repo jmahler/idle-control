@@ -15,5 +15,3 @@ D = tf([0.00093], [1], T);
 H = K*G/(1 + D*G);
 
 sys = minreal(H);  % cancel common roots
-
-endfunction

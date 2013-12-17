@@ -13,15 +13,19 @@ ncyl = 8;  % number of cylinders
 rpm = 700;  % idle rpm
 
 Gz = engine_model(T);
-[Phi,Gamma,H,G] = ssdata(Gz);
+Gzx = Gz - rpm;
+% XXX - Gzx should output zero at rpm, but it doesn't
+% A control input of 47/1450.1 results in 700 rpm. Why?
+[Phi,Gamma,H,G] = ssdata(Gzx);
+% XXX - is this the right H?
 
 n = length(Phi);  % order
 
 % Find K
 % roots
-z1 = [0.9 0.9 0];
+%z1 = [0.9 0.9 0];
 %z1 = [0.5 0.5 0];
-%z1 = [(0.9 + 0.05i) (0.9 - 0.5i) 0];
+z1 = [(0.9 + 0.05i) (0.9 - 0.5i) 0];
 %z1 = [(0.5 + 0.05i) (0.5 - 0.5i) 0];
 %z1 = [0.9 0.9 0.9 0.9];
 K1 = myacker(Phi, Gamma, z1);
@@ -52,7 +56,7 @@ sysX = sminreal(sysX);
 % Simulate
 x0 = [1; zeros(5,1)];
 u1 = 0*ones([Tend/T 1]);
-u2 = -rpm*ones([Tend/T 1]);
+u2 = -rpm*ones([Tend/T 1]);  % XXX - shouldn't be negative!
 u = [u1 u2];
 [y1,t1] = lsim1(sysX, u, [], x0);
 %y1 = y1 + rpm;

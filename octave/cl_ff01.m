@@ -8,61 +8,65 @@ clear;
 clf;
 
 T = 1;  % time step
-Tend = 10;
-
-% roots
-z1 = [0.9 0 0];
-%z1 = [0.9 0.9 0];
-%z2 = [(0.9 + 0.05i) (0.9 - 0.5i) 0];
-%z1 = [0.9 0.9 0.9 0.9];
-%z2 = [(0.9 + 0.05i) (0.9 - 0.5i) (0.8 + 0.4i) (0.8 - 0.4i)];
+Tend = 100;
+ncyl = 8;  % number of cylinders
+rpm = 700;  % idle rpm
 
 Gz = engine_model(T);
+[Phi,Gamma,H,G] = ssdata(Gz);
 
-[A,B,C,D] = tf2ss(Gz);
-sysD = ss(Gz);
+n = length(Phi);  % order
 
-n = length(A);  % order
-
-[Phi,Gamma,H,G] = ssdata(sysD);
-
-% can't use 'place' with identical roots
-%K1 = place(Phi, Gamma, z1);
+% Find K
+% roots
+z1 = [0.9 0.9 0];
+%z1 = [0.5 0.5 0];
+%z1 = [(0.9 + 0.05i) (0.9 - 0.5i) 0];
+%z1 = [(0.5 + 0.05i) (0.5 - 0.5i) 0];
+%z1 = [0.9 0.9 0.9 0.9];
 K1 = myacker(Phi, Gamma, z1);
-%K2 = myacker(Phi, Gamma, z2);
-
 % create a gain of K using D and zeroing others
-sysK1 = ss(zeros(1,1), zeros(1,3), zeros(1,1), K1, T);
-%sysK2 = ss(zeros(1,1), zeros(1,n), zeros(1,1), K2, T);
+K1z = ss(zeros(1,1), zeros(1,n), zeros(1,1), K1, T);
 
-sysCL1 = feedback(sysD, sysK1, -1);
-%sysCL2 = feedback(sysD, sysK2, -1);
+% Find Predictor Estimator (Lp)
+%H = [1 0 0];  % filter
+% roots
+z2 = z1*0.84;
+%z2 = [(0.4 + 0.4i) (0.4 - 0.4i) 0];
+%Lp = place(Phi', H', z2)';
+Lp = myacker(Phi', H', z2)';
+Pz = ss((Phi - Gamma*K1 - Lp*H), Lp, eye(n), zeros(n,1), T);
 
-% simplify, structural pole/zero cancellation
-sysCL1 = sminreal(sysCL1);
-%sysCL2 = sminreal(sysCL2);
+% Build System
+% upper branch
+set(Gz, 'inname', 'gu', 'outname', 'gy');
+sum1 = sumblk('y = gy - rpm');
+Gzs = connect(Gz, sum1, {'gu', 'rpm'}, {'y'});
+% lower feedback branch
+K1Pz = series(Pz, K1);
+set(K1Pz, 'inname', 'u1', 'outname', 'y1');
+% full system
+sysX = feedback(Gzs, K1Pz, [1], [1], -1);
+sysX = sminreal(sysX);
 
-%u = zeros([(Tend/T) 1]);
-%[y1,t1] = lsim(sysCL1, u, [], x0);
-%[y2,t2] = lsim(sysCL2, u, [], x0);
+% Simulate
+x0 = [1; zeros(5,1)];
+u1 = 0*ones([Tend/T 1]);
+u2 = -rpm*ones([Tend/T 1]);
+u = [u1 u2];
+[y1,t1] = lsim1(sysX, u, [], x0);
+%y1 = y1 + rpm;
 
-%figure(1);
-%subplot(2, 1, 1);
-%%plot(t2, y1);  % all
-%plot(t2, y1(:,1));  % one
-%grid on;
-%axis tight;
-%title('Regulator Response, roots: (0.9 0.9 0.9 0.9)');
-%%xlabel('time (sec)');
-%ylabel('y');
-%
-%subplot(2, 1, 2);
-%%plot(t2, y2);  % all
-%plot(t2, y2(:,1));  % one
-%grid on;
-%axis tight;
-%title('Regulator Response, roots: (0.9 + 0.05i) (0.9 - 0.5i) (0.8 + 0.4i) (0.8 - 0.4i)');
-%xlabel('time (sec)');
-%ylabel('y');
-%
+yX = y1(5:end);
+rt = rpmtime(yX, ncyl);
+
+figure(1);
+[ts1,ys1] = stairs(rt,yX);
+plot(ts1,ys1);
+grid on;
+axis tight;
+title('Control Law, Predictor Estimator');
+xlabel('time (sec)');
+ylabel('rpm');
+
 %print('cl_ff01.eps', '-depsc2');

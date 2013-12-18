@@ -8,7 +8,8 @@ all: 	cd_plot1.pdf \
 		em_plot1.pdf \
 		em_plot2.pdf \
 		em_plot3.pdf \
-		em_plot4.pdf
+		em_plot4.pdf \
+		cl_ff01.pdf
 
 %.eps: %.m
 	octave --silent $<

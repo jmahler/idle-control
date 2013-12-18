@@ -2,75 +2,64 @@
 % cl_ff01.m
 %
 % Control Law with full feedback.
+% Intuitive Design.
 %
 
 clear;
-clf;
 
 T = 1;  % time step
-Tend = 100;
+Tend = 200;  % end in ticks
 ncyl = 8;  % number of cylinders
-rpm = 700;  % idle rpm
+% stabilizes at rpm_lo then steps to rpm_hi
+rpm_hi = 700;  % idle rpm
+rpm_lo = 200;
+
+% choose any K <= 1
+% larger values increase overshoot
+K = 0.01;
 
 Gz = engine_model(T);
-Gzx = Gz - rpm;
-% XXX - Gzx should output zero at rpm, but it doesn't
-% A control input of 47/1450.1 results in 700 rpm. Why?
-[Phi,Gamma,H,G] = ssdata(Gzx);
-% XXX - is this the right H?
-
-n = length(Phi);  % order
-
-% Find K
-% roots
-%z1 = [0.9 0.9 0];
-%z1 = [0.5 0.5 0];
-z1 = [(0.9 + 0.05i) (0.9 - 0.5i) 0];
-%z1 = [(0.5 + 0.05i) (0.5 - 0.5i) 0];
-%z1 = [0.9 0.9 0.9 0.9];
-K1 = myacker(Phi, Gamma, z1);
-% create a gain of K using D and zeroing others
-K1z = ss(zeros(1,1), zeros(1,n), zeros(1,1), K1, T);
-
-% Find Predictor Estimator (Lp)
-%H = [1 0 0];  % filter
-% roots
-z2 = z1*0.84;
-%z2 = [(0.4 + 0.4i) (0.4 - 0.4i) 0];
-%Lp = place(Phi', H', z2)';
-Lp = myacker(Phi', H', z2)';
-Pz = ss((Phi - Gamma*K1 - Lp*H), Lp, eye(n), zeros(n,1), T);
 
 % Build System
 % upper branch
-set(Gz, 'inname', 'gu', 'outname', 'gy');
-sum1 = sumblk('y = gy - rpm');
-Gzs = connect(Gz, sum1, {'gu', 'rpm'}, {'y'});
-% lower feedback branch
-K1Pz = series(Pz, K1);
-set(K1Pz, 'inname', 'u1', 'outname', 'y1');
+sum1 = sumblk('e1 = u + r1');
+% convert rpm to control
+Rz = tf([1], [1450.1], T, 'inname', 'e1', 'outname', 'x1');
+set(Gz, 'inname', 'x1', 'outname', 'x2');
+sum2 = sumblk('y = x2 - r2');
+sys1 = connect(sum1, Rz, Gz, sum2, {'u', 'r1', 'r2'}, {'y'});
+% feedback branch
+Kz = tf([-K], [1], T, 'inname', 'y', 'outname', 'u');
 % full system
-sysX = feedback(Gzs, K1Pz, [1], [1], -1);
+sysX = feedback(sys1, Kz, [1], [1], +1);
 sysX = sminreal(sysX);
 
 % Simulate
-x0 = [1; zeros(5,1)];
+x0 = [1; zeros(length(sysX.a) - 1, 1)];
 u1 = 0*ones([Tend/T 1]);
-u2 = -rpm*ones([Tend/T 1]);  % XXX - shouldn't be negative!
-u = [u1 u2];
+c1 = Tend/T;
+stepc = c1/2;  % point at which step occurs
+r1 = [rpm_lo*ones([stepc 1]); rpm_hi*ones([stepc 1])];;
+r2 = r1;
+u = [u1 r1 r2];
 [y1,t1] = lsim1(sysX, u, [], x0);
-%y1 = y1 + rpm;
+y2 = y1 + r2;  % compensate for zero output in plot
 
-yX = y1(5:end);
+% be sure to avoid zeros, rpmtime doesn't handle them
+%yX = y2(10:end);  % all data, except first zeros (approx)
+yX = y2((stepc+1):end);  % data after step
 rt = rpmtime(yX, ncyl);
+rt = zerotime(rt);
 
+% Plot
+clf;
 figure(1);
 [ts1,ys1] = stairs(rt,yX);
 plot(ts1,ys1);
 grid on;
 axis tight;
-title('Control Law, Predictor Estimator');
+title('Control Law, Intuitive Design');
 xlabel('time (sec)');
 ylabel('rpm');
 
-%print('cl_ff01.eps', '-depsc2');
+print('cl_ff01.eps', '-depsc2');

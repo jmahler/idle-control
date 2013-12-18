@@ -916,6 +916,38 @@ to delta system.},
 
 % }}}
 
+% {{{ Control Response
+\clearpage
+\section{Control Response}
+\label{app:contrpm}
+
+For a given control input and zero torque the engine model will
+reach stable rpm values as shown in Figure \ref{fig:stable}.
+Equation \ref{eq:stable} describes its behavior.
+Listing \ref{lst:stable} shows how this was calculated.
+
+\begin{align}
+y &= 1450.1 x \label{eq:stable} \\
+	y &: \text{rpm (200 - 1200)} \notag \\
+	x &: \text{control (0 - 1)} \notag
+\end{align}
+
+\begin{figure}[htbp!]
+\begin{center}
+\includegraphics[scale=0.5]{../octave/em_plot3}
+\end{center}
+\caption{Stable rpm reached for a given constant control input.}
+\label{fig:stable}
+\end{figure}
+
+\clearpage
+\lstinputlisting[
+	caption={Matlab source to find the stable rpm for a given
+		control input.},
+	label={lst:stable}
+	]{../octave/em_plot3.m}
+% }}}
+
 % {{{ Engine Model Matlab Source
 \clearpage
 \section{Engine Model Matlab Source}
@@ -992,34 +1024,5 @@ and other functions are given in Appendix \ref{app:gf_matlab}.
 
 % }}}
 
-% {{{ Control Response
-\clearpage
-\section{Control Response}
-\label{app:contrpm}
-
-For a given control input and zero torque the engine model will
-reach stable rpm values as shown in Figure \ref{fig:stable}.
-Equation \ref{eq:stable} describes its behavior.
-Listing \ref{lst:stable} shows how this was calculated.
-
-\begin{align}
-y &= 1450.1 x \label{eq:stable}
-\end{align}
-
-\begin{figure}[htbp!]
-\begin{center}
-\includegraphics[scale=0.5]{../octave/em_plot3}
-\end{center}
-\caption{Stable rpm reached for a given constant control input.}
-\label{fig:stable}
-\end{figure}
-
-\clearpage
-\lstinputlisting[
-	caption={Matlab source to find the stable rpm for a given
-		control input.},
-	label={lst:stable}
-	]{../octave/em_plot3.m}
-% }}}
 
 \end{document}

@@ -1,8 +1,7 @@
 %
 % cl_ff01.m
 %
-% Control Law with full feedback.
-% Intuitive Design.
+% Control Law, Intuitive Design.
 %
 
 clear;

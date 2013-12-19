@@ -740,9 +740,7 @@ system and developing more complex values for $K$.
 \clearpage
 \section{Conclusion}
 
-% References
-\clearpage
-\printbibliography[heading=bibintoc]
+% TODO
 
 \clearpage
 \appendix
@@ -1107,5 +1105,29 @@ Matlab source code used to the Control Law regulator.
 	]{../octave/cl_ff01.m}
 
 % }}}
+
+% {{{ Colophon
+\clearpage
+\section{Colophon}
+\label{app:colophon}
+
+This written in \LaTeX and built using Pdflatex.
+The block diagrams were written using TikZ\autocite{tikz}.
+All calculations and plots were run using version 3.6.4 of
+Octave\autocite{octave}, an open source Matlab clone.
+When possible the examples were tested in Matlab/Simulink.
+However much of the code is dependent upon the
+Octave Control (CACSD) Tools\autocite{octave-control} which are
+not entirely compatible with Matlab.
+This document and all of its code are released under the
+GNU General Public License and freely
+available\autocite{github_jmahler_idle-control}.
+\nocite{github_jmahler_control}
+
+% }}}
+
+% References
+\clearpage
+\printbibliography[heading=bibintoc]
 
 \end{document}

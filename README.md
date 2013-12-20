@@ -12,15 +12,22 @@ techniques to automotive engine idle control.
 
 Download: [main.pdf](https://github.com/jmahler/idle-control/blob/build/paper/main.pdf?raw=true)
 
-Many of the examples Matlab code for performing the calculations
-and plotting the response.  They have all been tested with
-[Octave][octave].
+All of the Matlab code for performing calculations and producing
+plots is performed with [Octave][octave].  Except for a few instances
+all of the code works with Matlab as well.
 
  [octave]: http://www.gnu.org/software/octave/
 
-This document was written using [LaTeX][latex].
+The document was written using [LaTeX][latex].
 
  [latex]: http://www.latex-project.org/
+
+INDEX
+-----
+
+  doc/ - main document
+
+  matlab/ - All Matlab/Octave source code
 
 AUTHOR
 ------

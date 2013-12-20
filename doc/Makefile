@@ -14,3 +14,9 @@ clean:
 	-rm -f *.out *-blx.bib *.xml
 	-rm -f *.idx *.ilg *.ind *.idl
 	-rm -f main.pdf
+
+distclean:
+	-rm -f *.aux *.log *.blg *.bbl *.toc *.lof *.bcf
+	-rm -f *.out *-blx.bib *.xml
+	-rm -f *.idx *.ilg *.ind *.idl
+	-rm -f main.ps main.dvi

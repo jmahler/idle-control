@@ -1,8 +1,16 @@
-function [y, t, x, i] = lsim1(Hz, u, t=[], x0=false);
+function [y, t, x, i] = lsim1(Hz, u, t, x0);
 % LSIM1 - Just like lsim excpt small values are removed.
 %
 % "small" means less than or equal to 10.
 %
+
+switch nargin
+    case 2
+        t = [];
+        x0=false;
+    case 3
+        x0=false;
+end
 
 [y, t, x] = lsim(Hz, u, t, x0);
 
@@ -12,7 +20,7 @@ for i = 1:length(y)
 	if (x > 10)
 		break;
 	end
-endfor
+end
 
 % adjust for removed values
 y = y(i:end);

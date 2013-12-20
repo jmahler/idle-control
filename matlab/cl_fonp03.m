@@ -40,11 +40,11 @@ K1z = ss(zeros(1,1), zeros(1,n), zeros(1,1), -K1, T);
 sum1 = sumblk('x2 = x1 - rpm1');
 sum2 = sumblk('x2b = x1b - rpm1b');
 sum3 = sumblk('x2c = x1c - rpm1c');
-set(Gx, 'inname', 'e1', 'outname', {'x1', 'x1b', 'x1c'});
+set(Gx, 'InputName', 'e1', 'OutputName', {'x1', 'x1b', 'x1c'});
 sys1 = connect(sum1, sum2, sum3, Gx, {'e1', 'rpm1', 'rpm1b', 'rpm1c'}, {'x2', 'x2b', 'x2c'});
 sys2 = feedback(sys1, K1z, [1], [1 2 3], +1);
-set(sys2, 'inname', {'u2', 'rpm1', 'rpm1b', 'rpm1c'}, 'outname', {'x2', 'x2b', 'x2c'});
-set(Rz, 'inname', {'u1'}, 'outname', {'u2'});
+set(sys2, 'InputName', {'u2', 'rpm1', 'rpm1b', 'rpm1c'}, 'OutputName', {'x2', 'x2b', 'x2c'});
+set(Rz, 'InputName', {'u1'}, 'OutputName', {'u2'});
 sys3 = connect(sys2, Rz, {'u1', 'rpm1', 'rpm1b', 'rpm1c'}, {'x2', 'x2b', 'x2c'});
 % add y = H*x
 sys4 = series(sys3, Hz);
@@ -82,4 +82,4 @@ title('Control Law, Full Feedback, No Prediction');
 xlabel('time (sec)');
 ylabel('rpm');
 
-print('cl_fonp02.eps', '-depsc2');
+print('cl_fonp03.eps', '-depsc2');

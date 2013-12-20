@@ -20,9 +20,7 @@ for i = 1:length(rpm)
 		ts(i) = inf;
 	else
 		ts(i) = 1/x;
-	endif
-endfor
+	end
+end
 
 ts = cumsum(ts);
-
-endfunction

@@ -23,12 +23,12 @@ Gz = engine_model(T);
 % upper branch
 sum1 = sumblk('e1 = u + r1');
 % convert rpm to control
-Rz = tf([1], [1450.1], T, 'inname', 'e1', 'outname', 'x1');
-set(Gz, 'inname', 'x1', 'outname', 'x2');
+Rz = tf([1], [1450.1], T, 'InputName', 'e1', 'OutputName', 'x1');
+set(Gz, 'InputName', 'x1', 'OutputName', 'x2');
 sum2 = sumblk('y = x2 - r2');
 sys1 = connect(sum1, Rz, Gz, sum2, {'u', 'r1', 'r2'}, {'y'});
 % feedback branch
-Kz = tf([-K], [1], T, 'inname', 'y', 'outname', 'u');
+Kz = tf([-K], [1], T, 'InputName', 'y', 'OutputName', 'u');
 % full system
 sysX = feedback(sys1, Kz, [1], [1], +1);
 sysX = sminreal(sysX);

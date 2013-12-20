@@ -2,7 +2,7 @@
 all: main.pdf
 
 main.pdf: main.tex
-	cd ../octave; make
+	cd ../matlab; make
 	pdflatex main.tex
 	biber main
 	#makeglossaries main

@@ -13,8 +13,8 @@ rpm_hi = 700;  % idle rpm
 rpm_lo = 200;
 
 % Engine Model
-Gy = engine_model(T);
-[Phi, Gamma, H, J] = ssdata(Gy);
+[Phi, Gamma, H, J] = ss_engine_model(T);
+
 n = length(Phi);  % order
 % engine model that outputs x instead of y
 Gx = ss(Phi, Gamma, eye(n), zeros(n,1), T);

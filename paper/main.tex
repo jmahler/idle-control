@@ -102,18 +102,16 @@ Any time an accessory is turned on/off the torque applied to
 the engine changes.
 And changes in torque will change the engine rpm if the control
 inputs are constant.
-This paper shows how control system methods can be applied to
-the problem of idle stabilization.
+This paper investigates how control system designs can be applied
+to the problem of idle stabilization.
+Methods include: pole placement, direct design, and Control Law designs.
 Because the engine model is inherently discrete all of the methods
-used are also discrete.
-Methods include: pole placement, direct design, and
-various state space designs.
+discussed are also discrete.
 \end{abstract}
 
 \vspace{1.5in}
 
 % }}}
-
 
 \clearpage
 \tableofcontents
@@ -600,6 +598,7 @@ be chosen which may be less optimal.
 % {{{ Control Law, Intuitive Design
 \clearpage
 \section{Control Law, Intuitive Design}
+\label{sec:clid}
 
 % {{{ fig:clid01
 \begin{figure}[hpb!]
@@ -635,10 +634,9 @@ as a regulator is shown in Figure \ref{fig:clid01}.
 Notice that there is no input which means it acts as a regulator as
 opposed to a servo.
 
-There are several requirements that must be met in order for this
-system to be stable.
+Several requirements must be satisfied in order for this system to be stable.
 First, the input to $G(z)$ must reflect the output without any offset.
-And second the system must stabilize at zero.
+Second, the system must stabilize at zero.
 These requirements can be verified intuitively.
 Suppose for an input of $1$ to $G(z)$ an output of $5$ is produced.
 What value of $K$ will produce a stable value?
@@ -660,14 +658,15 @@ to $6$, will the system stabilize?
 An increase in the output creates positive feedback which increases
 the input causing a further increase in the output.
 The system diverges.
-This exercise can be repeated with a controller that has no offset at zero.
-The result is a negative feedback system that will stabilize at zero.
+This exercise can be repeated with a controller at zero with
+no input/output offset.
+The result is a stable negative feedback system.
 
 The linear engine model with zero torque (Equation \ref{eq:lems})
 satisfies neither of these requirements.
-The input does not reflect the output; the input range is from zero to
-one whereas the output range is from 200 to 1200.
-And operation at zero rpm is not realistic.
+There is an offset because the input has a range from zero to one which
+corresponds to a range of 200 to 1200 on the output.
+And operation at zero rpm is impossible.
 
 % {{{ fig:clid02
 \begin{figure}[!htp]
@@ -707,10 +706,10 @@ the desired rpm is reached.}
 \end{figure}
 % }}}
 
-The system in Figure \ref{fig:clid02} adds compensations to the
-engine model so that a regulator system can be constructed.
-An input of zero should produce the desired rpm.
-And this rpm input is converted to a control value ($R$).
+To resolve these issues compensation can be added to the
+system as shown in Figure \ref{fig:clid02}.
+An input of zero will produce the desired rpm.
+The rpm is then converted to a control value ($R$).
 And the reached rpm (output of $G(z)$) is subtracted from
 the goal rpm to produce a zero output.
 
@@ -728,19 +727,225 @@ Source code is provided in Appendix \ref{app:cl_matlab}.}
 \end{figure}
 % }}}
 
-Figure \ref{fig:cl_plot1} shows the response of this system.
-While the response isn't very good the design was trivial.
-A value for $K$ was arbitrarily chosen.
-Any values less than one were stable and larger values diverged.
-Later designs will improve performance by elaborating upon this
-system and developing more complex values for $K$.
+Figure \ref{fig:cl_plot1} shows the response of this system
+with an arbitrary value of $K$.
+Values less than or equal to one produced a stable response and
+anything larger will cause it to diverge.
+The response is mediocre but the design was trivial and
+required no calculations.
+Later designs will improve this system by constructing more
+complex values for $K$.
 
 % }}}
 
+% {{{ Control Law, Full Feedback, No Prediction
+\clearpage
+\section{Control Law, Full Feedback, No Prediction}
+\label{sec:clffnp}
+
+The simplest Control Law\autocite[Pg. 280]{franklin1998digital} design
+uses full feedback with no prediction.
+Ackermann's Formula is used to find $K$ for given values
+of $\Phi$ and $\Gamma$.
+Figure \ref{fig:clffnp01} shows the system.
+
+% {{{ fig:clffnp01
+\begin{figure}[!htp]
+\begin{center}
+
+\begin{tikzpicture}[>=triangle 60,
+	node distance=14mm, auto]
+
+	\node[sumxpxp] 	(sum1)	[]					{};
+	\node[gain]  	(R)		[right=of sum1] 	{$R$};
+	\node[gain]  	(Gz)	[right=of R] 		{$x(k + 1) = \Phi x + \Gamma u$};
+	\node[sumxpxn]	(sum2)	[right=of Gz]		{};
+	\node[gain]		(H)		[right=of sum2]		{$H$};
+	\node[gain] 	(K)		[below=of Gz] 		{$-K$};
+
+	\draw [<-] (sum1.north) -- ++(0,10mm) node[above]{$\text{rpm}$};
+	\draw [->] (sum1.east) -- (R.west);
+	\draw [->] (R.east) -- (Gz.west);
+	\draw [->] (Gz.east) -- (sum2.west);
+	\draw [<-] (sum2.north) -- ++(0,10mm) node[above]{$\text{rpm}$};
+	\draw [->] (sum2.east) -- ++(7mm,0) node[above,xshift=0mm]{$x$}
+		-| ++(0,-10mm)
+		|- (K.east);
+	\draw [->] (sum2.east) -- (H.west);
+	\draw [->] (H.east) -- ++(10mm,0) node[above,xshift=-3mm]{$y$};
+	\draw [<-] 
+		(sum1.west) -- ++(-10mm,0) node[above,xshift=3mm]{$u$}
+		|- (K.west);
+\end{tikzpicture}
+
+\end{center}
+
+\caption{Control Law system for full feedback with no prediction.
+The system is in the discrete state space form,
+with $\Phi$ and $\Gamma$, to allow Ackermann's formula to be
+used to find $K$.}
+\label{fig:clffnp01}
+\end{figure}
+% }}}
+
+Unfortunately the compensations that were added to make it possible
+to build a Control Law system (Section \ref{sec:clid}) create
+complications when applying Ackermann's Formula to find $K$.
+A system commonly given in the literature is
+shown in Figure \ref{fig:clffnp02}
+\footnote{Some diagrams omit $H$ but pass $x$ through an identity matrix.}.
+Here the scope of $\Phi$ and $\Gamma$ is clear and it is
+straight forward to apply Ackermann's Formula to find $K$.
+If the compensations in Figure \ref{fig:clffnp01} could be reduced
+to an equivalent transfer function with rpm set to a constant value
+Ackermann's could be equivalently applied.
+However the sum blocks cannot be reduced unless the constant input
+is zero, which is not the case here\footnote{Zero rpm is impossible, 700 rpm
+is a typical idle speed.}.
+
+% {{{ fig:clffnp02
+\begin{figure}[hpb!]
+\begin{center}
+
+\begin{tikzpicture}[>=triangle 60,
+	node distance=14mm, auto]
+
+	\node[gain]  	(Gz)	[] 		{$x(k + 1) = \Phi x + \Gamma u$};
+	\node[gain] 	(K)		[below=of Gz] 	{$-K$};
+	\node[gain]		(H)		[right=of Gz]	{$H$};
+
+	\draw [->]
+	 		(Gz.east) -- ++(7mm,0)
+			-| ++(0,-5mm)
+			|- (K.east);
+	\draw [->] (Gz.east) -- (H.west) node[above,xshift=-7mm]{$x$};
+	\draw [->] (H.east) -- ++(10mm,0) node[above,xshift=-3mm]{$y$};
+
+	\draw [<-]
+	 		(Gz.west) -- ++(-10mm,0)
+			-| ++(0,-10mm)
+			|- (K.west);
+\end{tikzpicture}
+
+\end{center}
+
+\caption{Typical Full Feedback system.}
+\label{fig:clffnp02}
+\end{figure}
+% }}}
+
+One possible solution is to rearrange the system as shown
+in Figure \ref{fig:clffnp03}.
+This resolves one of the sum blocks but another is still present.
+If it is assumed that this sum block can be ignored the following
+values were found\footnote{Matlab source is given in
+Listing \ref{lst:cl_fonp03} of Appendix \ref{app:cl_matlab}}.
+The resulting response is shown in Figure \ref{fig:cl_fonp03}.
+
+\begin{align*}
+	\text{roots} :& \quad (0.09 \pm 0.05i) \\
+				& \quad 0.01 \\
+	K &= [ -6.4313\mbox{\sc{e}-}03 \quad 8.6624\mbox{\sc{e}-}03
+			\quad -3.1446\mbox{\sc{e}-}04 ]
+\end{align*}
+
+% {{{ fig:clffnp03
+\begin{figure}[hpb!]
+\begin{center}
+
+\begin{tikzpicture}[>=triangle 60,
+	node distance=14mm, auto]
+
+	\node[gain]  	(R)		[] 				{$R$};
+	\node[sumpp]	(sum1)	[right=of R]	{};
+	\node[gain]  	(Gz)	[right=of sum1]	{$x(k + 1) = \Phi x + \Gamma u$};
+	\node[sumxpxn]	(sum2)	[right=of Gz]	{};
+	\node[gain] 	(K)		[below=of Gz] 	{$-K$};
+	\node[gain]		(H)		[right=of sum2]	{$H$};
+
+	\draw [->] ++(-15mm,0) node[left]{$\text{rpm}$} -- (R.west);
+	\draw [->] (R.east) -- (sum1.west);
+	\draw [->] (sum1.east) -- (Gz.west);
+	\draw [<-] (sum2.north) -- ++(0,10mm) node[above]{$\text{rpm}$};
+	\draw [->] (Gz.east) -- (sum2.west);
+	\draw [->]
+	 		(sum2.east) -- ++(7mm,0)
+			-| ++(0,-5mm)
+			|- (K.east);
+	\draw [->] (sum2.east) -- (H.west) node[above,xshift=-7mm]{$x$};
+	\draw [->] (H.east) -- ++(10mm,0) node[above,xshift=-3mm]{$y$};
+	\draw [<-]
+	 		(sum1.south)
+			|- (K.west);
+\end{tikzpicture}
+
+\end{center}
+
+\caption{Rearranged Control Law system to exclude one sum block.}
+\label{fig:clffnp03}
+\end{figure}
+% }}}
+
+% {{{ fig:cl_fonp03
+\begin{figure}[htbp!]
+\begin{center}
+\includegraphics[scale=0.7]{../matlab/cl_fonp03}
+\end{center}
+\caption{Output response if sum block is ignored and $K$ is found.
+Rpm input is 200 until 0.6 sec where it steps to 700.
+The output should reflect the input which this clearly does not.
+Matlab source is given in Listing \ref{lst:cl_fonp03}
+of Appendix \ref{app:cl_matlab}.
+}
+\label{fig:cl_fonp03}
+\end{figure}
+% }}}
+
+It is clear from the response that the sum block plays an important
+role with regard to the calculation of $K$ using Ackermann's Formula.
+However it has not been determined how this problem can be
+resolved to find a valid value.
+
+% }}}
+
+% {{{ Conclusion
 \clearpage
 \section{Conclusion}
 
-% TODO
+The goal of this paper was to apply a range of control system
+designs to the problem of idle stabilization with a spark ignition
+engine.
+Unfortunately, numerous difficulties were encountered with this
+real world problem.
+
+The engine model took a torque input to a sum block.
+To simplify calculations it was assumed to be zero which allowed
+the simplification of the system in to a single transfer function.
+A non-zero value would have substantially complicated matters.
+
+The engine model did not accept steady state inputs.
+Transfer functions had to be found for converting a steady state to a
+delta and from a delta to a steady state.
+
+The engine model cannot operate at zero rpm because this is a
+nonsensical value.
+Similarly a unit step input could not be used because both zero
+and one rpm are equally nonsensical.
+The scheme that was devised was to apply a custom input that started
+at 200 rpm and then stepped to 700 rpm.
+Then the resulting response could be seen under a typical range.
+
+Several designs were successfully applied.
+A direct design using pole placement was constructed that had improved
+performance compared to no control
+And a Control Law design built using an intuitive design was a success.
+A Control Law with Full Feedback was attempted but was not a success.
+The complications created by a sum block prevented a correct $K$
+from being found using Ackermann's Formula.
+No designs beyond this were attempted because they would be equally
+hampered by the same problems.
+
+% }}}
 
 \clearpage
 \appendix
@@ -1068,6 +1273,10 @@ used among several methods.
 	caption={Matlab source of modified lsim() function.} 
 	]{../matlab/lsim1.m}
 
+\lstinputlisting[
+	caption={Matlab source of rpmtime() function.} 
+	]{../matlab/rpmtime.m}
+
 % }}}
 
 % {{{ Direct Design Matlab Source
@@ -1098,11 +1307,18 @@ and other functions are given in Appendix \ref{app:gf_matlab}.
 \section{Control Law Matlab Source}
 \label{app:cl_matlab}
 
-Matlab source code used to the Control Law regulator.
+The following Matlab source code was using for the Control Law Designs
+(Section \ref{sec:clid}, \ref{sec:clffnp}).
 
 \lstinputlisting[
 	caption={Matlab source used to plot the Control Law regulator.}
 	]{../matlab/cl_ff01.m}
+
+\lstinputlisting[
+	caption={Matlab source used to plot the Control Law with no predicition
+	if sum block is ignored (Figure \ref{fig:cl_fonp03}).},
+	label=lst:cl_fonp03,
+	]{../matlab/cl_fonp03.m}
 
 % }}}
 
@@ -1125,7 +1341,7 @@ In a few cases an equivalent Simulink diagram was built and in
 each of the cases the results agreed.
 This document and all of its code are released under the
 GNU General Public License and freely
-available\autocite{github_jmahler_idle-control}.
+available to download and modify\autocite{github_jmahler_idle-control}.
 \nocite{github_jmahler_control}
 
 % }}}

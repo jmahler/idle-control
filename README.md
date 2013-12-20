@@ -10,7 +10,7 @@ DESCRIPTION
 This paper investigates the application of control system
 techniques to automotive engine idle control.
 
-Download: [main.pdf](https://github.com/jmahler/idle-control/blob/build/paper/main.pdf?raw=true)
+Download: [main.pdf](https://github.com/jmahler/idle-control/blob/build/doc/main.pdf?raw=true)
 
 All of the Matlab code for performing calculations and producing
 plots is performed with [Octave][octave].  Except for a few instances

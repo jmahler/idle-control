@@ -325,7 +325,7 @@ to delta and vice versa.}
 % {{{ fig:em_plot
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.7]{../octave/em_plot1}
+\includegraphics[scale=0.7]{../matlab/em_plot1}
 \end{center}
 \caption{Output response of engine model with no control.
 The control can range from zero to one.
@@ -364,7 +364,7 @@ of a controller.
 % {{{ fig:rpmtime_plot
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.7]{../octave/em_plot2}
+\includegraphics[scale=0.7]{../matlab/em_plot2}
 \end{center}
 \caption{Engine rpm response compared to time with a constant
 0.65 input control.}
@@ -387,7 +387,7 @@ Its behavior can still be improved with a controller.
 % {{{ fig:em_plot4
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.6]{../octave/em_plot4}
+\includegraphics[scale=0.6]{../matlab/em_plot4}
 \end{center}
 \caption{Response for a shifted and scaled step input with zero torque.}
 \label{fig:em_plot4}
@@ -574,7 +574,7 @@ It is likely that further improvement could be made by optimizing the roots.
 % {{{ fig:dd_plot2
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.6]{../octave/dd_plot2}
+\includegraphics[scale=0.6]{../matlab/dd_plot2}
 \end{center}
 \caption{Output response of controller built using Direct Design
 compared to no control.  For no control this is the same plot
@@ -717,7 +717,7 @@ the goal rpm to produce a zero output.
 % {{{ fig:cl_plot1
 \begin{figure}[!htp]
 \begin{center}
-\includegraphics[scale=0.6]{../octave/cl_ff01}
+\includegraphics[scale=0.6]{../matlab/cl_ff01}
 \end{center}
 \caption{Output response of Control Law regulator with $K = 0.01$
 and rpm = $700$.
@@ -804,7 +804,7 @@ It can be seen that if the input is held constant the output (delta)
 returns to zero as expected.
 
 \begin{figure}[htbp!]
-\includegraphics[scale=0.7]{../octave/cd_plot1}
+\includegraphics[scale=0.7]{../matlab/cd_plot1}
 \caption{Response of full steady state input to delta output system
 to an arbitrary input signal.
 The upper plot is the input signal ($u$) and the lower plot is
@@ -859,7 +859,7 @@ It can be seen in Figure \ref{fig:cd_plot2} that the simplified system
 behaves identically to the previous system (Figure \ref{fig:cd_plot1}).
 
 \begin{figure}[htbp!]
-\includegraphics[scale=0.7]{../octave/cd_plot2}
+\includegraphics[scale=0.7]{../matlab/cd_plot2}
 \caption{Response of simplified steady state input to delta output system
 to an arbitrary input signal.
 The upper plot is the input signal ($u$) and the lower plot is
@@ -880,13 +880,13 @@ The Matlab source code is given in Listing \ref{lst:cd_plot2}.
 \lstinputlisting[caption={Matlab code to plot the full steady state
 to delta system.},
 	label=lst:cd_plot1
-	]{../octave/cd_plot1.m}
+	]{../matlab/cd_plot1.m}
 
 \clearpage
 \lstinputlisting[caption={Matlab code to plot the simplified steady state
 to delta system.},
 	label=lst:cd_plot2
-	]{../octave/cd_plot2.m}
+	]{../matlab/cd_plot2.m}
 
 % }}}
 
@@ -961,7 +961,7 @@ to the delta inputs as expected.
 
 % {{{ fig:dc_plot2
 \begin{figure}[htbp!]
-\includegraphics[scale=0.7]{../octave/dc_plot2}
+\includegraphics[scale=0.7]{../matlab/dc_plot2}
 \caption{Response of delta input to steady state output system
 when given an arbitrary input signal.
 The upper plot is the input signal ($u$) and the lower plot is
@@ -981,7 +981,7 @@ The Matlab source code is given in Listing \ref{lst:dc_plot2}.
 \lstinputlisting[caption={Matlab code to plot the simplified steady state
 to delta system.},
 	label=lst:dc_plot2
-	]{../octave/dc_plot2.m}
+	]{../matlab/dc_plot2.m}
 
 % }}}
 
@@ -1003,7 +1003,7 @@ y &= 1450.1 x \label{eq:stable} \\
 
 \begin{figure}[htbp!]
 \begin{center}
-\includegraphics[scale=0.5]{../octave/em_plot3}
+\includegraphics[scale=0.5]{../matlab/em_plot3}
 \end{center}
 \caption{Stable rpm reached for a given constant control input.}
 \label{fig:stable}
@@ -1014,7 +1014,7 @@ y &= 1450.1 x \label{eq:stable} \\
 	caption={Matlab source to find the stable rpm for a given
 		control input.},
 	label={lst:stable}
-	]{../octave/em_plot3.m}
+	]{../matlab/em_plot3.m}
 % }}}
 
 % {{{ Engine Model Matlab Source
@@ -1026,25 +1026,25 @@ y &= 1450.1 x \label{eq:stable} \\
 	caption={Matlab source to calculate the engine model system with
 		zero torque.  This function is called by other scripts that
 	use this model.}
-	]{../octave/engine_model.m}
+	]{../matlab/engine_model.m}
 
 \lstinputlisting[
 	caption={Matlab source to plot the response of engine model
 		with no control. The $x$ axis is in ticks.}
-	]{../octave/em_plot1.m}
+	]{../matlab/em_plot1.m}
 
 % XXX
 \clearpage
 \lstinputlisting[
 	caption={Matlab source to plot the response of engine model
 	with no control.  The $x$ axis is in time.}
-	]{../octave/em_plot2.m}
+	]{../matlab/em_plot2.m}
 
 \clearpage
 \lstinputlisting[
 	caption={Matlab source to plot the response of engine model
 		versus time for a typical 600 to 1000 rpm range.}
-	]{../octave/em_plot4.m}
+	]{../matlab/em_plot4.m}
 % }}}
 
 % {{{ General Matlab Functions
@@ -1057,16 +1057,16 @@ used among several methods.
 
 \lstinputlisting[
 	caption={Matlab source of function to calculate a Sylvester Matrix.} 
-	]{../octave/sylvester.m}
+	]{../matlab/sylvester.m}
 
 \lstinputlisting[
 	caption={Matlab source of function to calculate zero time.} 
-	]{../octave/zerotime.m}
+	]{../matlab/zerotime.m}
 
 \clearpage
 \lstinputlisting[
 	caption={Matlab source of modified lsim() function.} 
-	]{../octave/lsim1.m}
+	]{../matlab/lsim1.m}
 
 % }}}
 
@@ -1083,13 +1083,13 @@ and other functions are given in Appendix \ref{app:gf_matlab}.
 \lstinputlisting[
 	caption={Matlab source of function is to build a controller using
 		Direct Design.}
-	]{../octave/direct_design.m}
+	]{../matlab/direct_design.m}
 
 \clearpage
 \lstinputlisting[
 	caption={Matlab source used to plot the controller built using
 	Direct Design compared to no control.}
-	]{../octave/dd_plot2.m}
+	]{../matlab/dd_plot2.m}
 
 % }}}
 
@@ -1102,7 +1102,7 @@ Matlab source code used to the Control Law regulator.
 
 \lstinputlisting[
 	caption={Matlab source used to plot the Control Law regulator.}
-	]{../octave/cl_ff01.m}
+	]{../matlab/cl_ff01.m}
 
 % }}}
 
@@ -1115,10 +1115,14 @@ This written in \LaTeX and built using Pdflatex.
 The block diagrams were written using TikZ\autocite{tikz}.
 All calculations and plots were run using version 3.6.4 of
 Octave\autocite{octave}, an open source Matlab clone.
-When possible the examples were tested in Matlab/Simulink.
-However much of the code is dependent upon the
-Octave Control (CACSD) Tools\autocite{octave-control} which are
-not entirely compatible with Matlab.
+Except for a few instances (\verb+cl_fonp02.m+, \verb+cl_fonp03.m+) the
+M-Files are completely compatible between both Octave and Matlab.
+The entire control system is built within the M-File and has
+no dependence on Simulink.
+Octave uses the Octave Control (CACSD) Tools\autocite{octave-control} 
+which have equivalents in Matlab.
+In a few cases an equivalent Simulink diagram was built and in
+each of the cases the results agreed.
 This document and all of its code are released under the
 GNU General Public License and freely
 available\autocite{github_jmahler_idle-control}.

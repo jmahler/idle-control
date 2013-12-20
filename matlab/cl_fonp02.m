@@ -31,7 +31,8 @@ Hz = ss(0, zeros(1,n), 0, H, T);
 z1 = [(0.9 + 0.05i) (0.9 - 0.05i) 0.01];
 %z1 = [0.5 0.4 0];
 %z1 = [0.05 0.04 0];
-K1 = place(Phi, Gamma, z1);
+%K1 = place(Phi, Gamma, z1);
+K1 = myacker(Phi, Gamma, z1);
 % create a gain of -K using D and zeroing others
 K1z = ss(zeros(1,1), zeros(1,n), zeros(1,1), -K1, T);
 

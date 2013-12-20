@@ -20,7 +20,7 @@ for i = 1:length(us)
 
 	% save the stable value
 	y(i) = yp(end);	
-endfor
+end
 
 figure(1);
 

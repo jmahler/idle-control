@@ -1,17 +1,32 @@
 
+matlab/
+
+DESCRIPTION
+-----------
+
+These M-Files are used to perform the calculations and produce
+the plots for the main document.  They were all built and tested
+using Octave but most of them work with Matlab as well.
+
+To build all the files run:
+
+  $ make
+
 MODELS
 ------
-
-  em_* - Engine model plots and calculations.
-		 All controllers are for this plant/model.
-
-  dd_* - Direct design controllers.
 
   cd_* - Steady state to discrete calculations.
   cd_*
 
+  cl_* - Control Law Designs
+
   dc_* - Discrete to steady state calculations.
   dc_*
+
+  dd_* - Direct design controllers.
+
+  em_* - Engine model plots and calculations.
+		 All controllers are for this plant/model.
 
 FUNCTIONS
 ---------
